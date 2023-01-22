@@ -18,7 +18,12 @@ jobsched-api
     :target: https://opensource.org/licenses/MIT
     :alt: license: MIT
 
-A RESTful API service for scheduling interactive and non-interactive (batch) jobs.
+A RESTful API service for scheduling interactive and non-interactive (batch) jobs in a computer cluster. The service
+facilitates the communication with the cluster job scheduler by providing a simple and clean interface that abstracts
+the complexity that is typically involved when dealing with a cluster scheduler. The 2 most common operations pertaining
+job scheduling are job composition and submission (``qsub``) and querying a job for its status (``qstat``).
+
+The service currently supports ``OpenPBS`` and ``PBSPro`` as a job scheduler.
 
 Setup 🔧
 =====
