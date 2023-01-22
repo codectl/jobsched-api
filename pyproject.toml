@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "jobsched-api"
+version = "0.1.0"
+description = "A RESTful API for job scheduling operations."
+authors = ["Renato Damas <rena2damas@gmail.com>"]
+license = "MIT"
+readme = "README.rst"
+packages = [
+    { include = "*", from = "src" }
+]
+homepage = ""
+repository = "https://github.com/codectl/jobsched-api"
+documentation = ""
+keywords = [
+    "jobsched-api",
+    "hpc",
+    "slurm",
+    "altair",
+    "pbs",
+    "openpbs",
+    "pbspro",
+    "torque",
+    "swagger",
+    "openapi",
+    "oas3",
+    "rest",
+    "api",
+    "web",
+    "flask",
+    "python",
+    "python3"
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10"
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
