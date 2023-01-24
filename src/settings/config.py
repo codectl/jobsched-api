@@ -1,4 +1,5 @@
 import sys
+from typing import Type
 
 from pydantic import BaseSettings
 
@@ -24,7 +25,6 @@ class _Settings(BaseSettings):
 
 class ProductionSettings(_Settings):
     ENV = "production"
-    LOG_LEVEL = "INFO"
 
 
 class DevelopmentSettings(_Settings):
@@ -36,10 +36,13 @@ class DevelopmentSettings(_Settings):
 class TestingSettings(_Settings):
     ENV = "testing"
     TESTING = True
-    LOG_LEVEL = "DEBUG"
 
 
-def swagger_configs(app_root="/"):
+def settings_class(environment: str) -> Type[_Settings]:
+    return getattr(sys.modules[__name__], f"{environment.capitalize()}Settings")
+
+
+def swagger_configs(app_root="/") -> dict:
     prefix = "" if app_root == "/" else app_root
     return {
         "url_prefix": prefix,
@@ -48,8 +51,3 @@ def swagger_configs(app_root="/"):
         "swagger_favicon": "favicon.ico",
         "swagger_hide_bar": True,
     }
-
-
-def settings_class(environment: str):
-    """Link given environment to a config class."""
-    return getattr(sys.modules[__name__], f"{environment.capitalize()}Settings")
