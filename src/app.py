@@ -8,9 +8,8 @@ from flask import Blueprint, Flask
 from flask_cors import CORS
 
 from src import __description__, __title__, __version__
-from src.settings import oas
 from src.settings.ctx import ctx_settings
-from src.settings.env import config_class
+from src.settings.config import settings_class, swagger_configs
 
 
 def create_app(environ="development", configs=None):
@@ -19,9 +18,9 @@ def create_app(environ="development", configs=None):
     # define the WSGI application object
     app = Flask(__name__, static_folder=None)
 
-    # load object-based default configuration
-    app.config.from_object(config_class(environ))
-    app.config.update(configs or {})
+    config = settings_class(environ)().dict()
+    config.update(configs or {})
+    app.config.update(config)
 
     setup_app(app)
 
@@ -73,7 +72,7 @@ def setup_app(app):
         spec.path(view=view, app=app, base_path=url_prefix)
 
     # create views for Swagger
-    Swagger(app=app, apispec=spec, config=oas.swagger_configs(app_root=url_prefix))
+    Swagger(app=app, apispec=spec, config=swagger_configs(app_root=url_prefix))
 
     # settings within app ctx
     ctx_settings(app)
