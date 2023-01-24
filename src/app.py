@@ -49,12 +49,8 @@ def setup_app(app):
         auths=[AuthSchemes.BasicAuth()],
         tags=[
             Tag(
-                name="filesystem",
-                description="CRUD operations over files in the current filesystem",
-            ),
-            Tag(
-                name="file manager",
-                description="Actions that serve React component named File Manager",
+                name="pbs",
+                description="operations on PBS scheduler",
             ),
         ],
     )
