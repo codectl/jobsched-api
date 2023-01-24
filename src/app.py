@@ -13,7 +13,6 @@ from src.settings.config import settings_class, swagger_configs
 
 
 def create_app(environ="development", configs=None):
-    """Create a new app."""
 
     # define the WSGI application object
     app = Flask(__name__, static_folder=None)
@@ -28,7 +27,6 @@ def create_app(environ="development", configs=None):
 
 
 def setup_app(app):
-    """Initial setups."""
     CORS(app)  # enable CORS
 
     url_prefix = app.config["APPLICATION_ROOT"]
@@ -49,8 +47,8 @@ def setup_app(app):
         auths=[AuthSchemes.BasicAuth()],
         tags=[
             Tag(
-                name="pbs",
-                description="operations on PBS scheduler",
+                name="PBS",
+                description="Operations on the PBS scheduler",
             ),
         ],
     )
