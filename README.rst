@@ -6,10 +6,10 @@ jobsched-api
     :target: https://hub.docker.com/repository/docker/renatodamas/jobsched-api
     :alt: docker
 .. image:: https://github.com/codectl/jobsched-api/actions/workflows/ci.yaml/badge.svg
-    :target: https://github.com/rena2damas/jobsched-api/actions/workflows/ci.yaml
+    :target: https://github.com/codectl/jobsched-api/actions/workflows/ci.yaml
     :alt: CI
 .. image:: https://codecov.io/gh/codectl/jobsched-api/branch/master/graph/badge.svg
-    :target: https://app.codecov.io/gh/rena2damas/jobsched-api/branch/master
+    :target: https://app.codecov.io/gh/codectl/jobsched-api/branch/master
     :alt: codecov
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
