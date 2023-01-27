@@ -1,5 +1,4 @@
 import sys
-from typing import Type
 
 from pydantic import BaseSettings
 
@@ -38,7 +37,7 @@ class TestingSettings(_Settings):
     TESTING = True
 
 
-def settings_class(environment: str) -> Type[_Settings]:
+def settings_class(environment: str) -> type[_Settings]:
     return getattr(sys.modules[__name__], f"{environment.capitalize()}Settings")
 
 
