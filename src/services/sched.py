@@ -6,12 +6,7 @@ from src.models.job import Job, JobStatus
 
 
 class Sched(abc.ABC):
-
-    def __init__(
-        self,
-        exec_path: Path,
-        server: str
-    ):
+    def __init__(self, exec_path: Path, server: str):
         self.exec_path = exec_path
         self.server = server
 
