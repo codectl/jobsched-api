@@ -1,12 +1,16 @@
 import abc
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 from src.models.job import Job, JobStatus
 
 
 class Sched(abc.ABC):
-    def __init__(self, exec_path: Path, server: str):
+    def __init__(
+            self,
+            exec_path: Optional[Path] = None,
+            server: Optional[str] = None,
+    ):
         self.exec_path = exec_path
         self.server = server
 
