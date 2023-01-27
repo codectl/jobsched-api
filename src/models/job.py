@@ -1,8 +1,8 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 
-from pydantic import BaseModel, Field, create_model, validator
+from pydantic import BaseModel, Field, create_model, root_validator, validator
 
 
 class JobStatus(Enum):
@@ -20,8 +20,8 @@ class JobStatus(Enum):
 
 class Job(BaseModel):
     """
-    The attributes of a PBS job.
-    See https://manpages.ubuntu.com/manpages/trusty/man7/pbs_job_attributes.7B.html.
+    The attributes of a job.
+    For PBS job documentations, see at https://bit.ly/3WG0Mmg.
     """
     job_id: Optional[str] = None
     name: str = Field(None, alias="Job_Name")
@@ -54,9 +54,20 @@ class Job(BaseModel):
     rerunable: Optional[bool] = Field(None, alias="Rerunable")
     env: Optional[dict] = Field(None, alias="Variable_List")
     mail_to: Optional[list] = Field(None, alias="Mail_Users")
+    extra: Optional[dict] = None
 
     class Config:
         allow_population_by_field_name = True
+
+    @root_validator(pre=True)
+    def extra_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
+        extra: dict[str, Any] = {}
+        fields = {f.alias for f in cls.__fields__.values() if f.alias != "extra"}
+        for k, v in values.items():
+            if k not in fields:
+                extra[k] = v
+        values["extra"] = extra
+        return values
 
     @validator("created_at", "updated_at", "queued_at", "ready_at", pre=True)
     def parse_date(cls, value):
