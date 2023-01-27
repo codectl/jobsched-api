@@ -1,5 +1,6 @@
-from flask import Blueprint, request
+from flask import Blueprint, current_app, request
 from flask_restful import Api, Resource
+from werkzeug.local import LocalProxy
 
 from src.utils import abort_with
 from src.api.auth import requires_auth
@@ -8,6 +9,14 @@ from src.services.pbs import PBS
 
 blueprint = Blueprint("pbs", __name__, url_prefix="/pbs")
 api = Api(blueprint)
+
+# proxy to load PBS service
+_PBS = LocalProxy(
+    lambda: PBS(
+        exec_path=current_app.config["SCHED_EXEC_PATH"],
+        server=current_app.config["SCHED_SERVER"],
+    )
+)
 
 
 @api.resource("/qsub", endpoint="qsub")
@@ -35,9 +44,8 @@ class Qsub(Resource):
             400:
             401:
         """
-        pbs = PBS()
         props: Job = Job.parse_obj(request.json)
         try:
-            return pbs.qsub(props)
+            return _PBS.qsub(props)
         except Exception as ex:
             abort_with(code=400, description=str(ex))
