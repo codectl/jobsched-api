@@ -33,7 +33,7 @@ def raw_data():
                     "ncpus": 1,
                     "nodect": 1,
                     "place": "pack",
-                    "select": "1:ncpus=1"
+                    "select": "1:ncpus=1",
                 },
                 "schedselect": "1:ncpus=1",
                 "substate": 10,
@@ -47,7 +47,7 @@ def raw_data():
                     "PBS_O_WORKDIR": "/home/user/Tasks/overlay",
                     "PBS_O_SYSTEM": "Linux",
                     "PBS_O_QUEUE": "workq",
-                    "PBS_O_HOST": "vbox"
+                    "PBS_O_HOST": "vbox",
                 },
                 "euser": "root",
                 "egroup": "root",
@@ -61,7 +61,7 @@ def raw_data():
                 "project": "_pbs_project_default",
                 "Account_Name": "pbs_account",
             }
-        }
+        },
     }
 
 

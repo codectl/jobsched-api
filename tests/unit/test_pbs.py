@@ -18,6 +18,5 @@ def job():
 
 
 class TestPBS:
-
     def test_qsub(self, pbs, job):
         job.dict(exclude_none=True)

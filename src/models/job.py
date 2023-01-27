@@ -23,6 +23,7 @@ class Job(BaseModel):
     The attributes of a job.
     For PBS job documentations, see at https://bit.ly/3WG0Mmg.
     """
+
     job_id: Optional[str] = None
     name: str = Field(None, alias="Job_Name")
     owner: Optional[str] = Field(None, alias="Job_Owner")
@@ -32,16 +33,18 @@ class Job(BaseModel):
     submit_args: Optional[str] = Field(None, alias="Submit_arguments")
     stdout_path: Optional[str] = Field(None, alias="Output_Path")
     stderr_path: Optional[str] = Field(None, alias="Error_Path")
-    resources: Optional[create_model(
-        "Resources",
-        select=(str, ...),
-        mem=(Optional[str], None),
-        cpu=(Optional[int], Field(None, alias="ncpus")),
-        gpu=(Optional[int], Field(None, alias="ngpus")),
-        node_count=(Optional[int], Field(None, alias="nodect")),
-        place=(Optional[str], None),
-        walltime=(Optional[str], None),
-    )] = Field(None, alias="Resource_List")
+    resources: Optional[
+        create_model(
+            "Resources",
+            select=(str, ...),
+            mem=(Optional[str], None),
+            cpu=(Optional[int], Field(None, alias="ncpus")),
+            gpu=(Optional[int], Field(None, alias="ngpus")),
+            node_count=(Optional[int], Field(None, alias="nodect")),
+            place=(Optional[str], None),
+            walltime=(Optional[str], None),
+        )
+    ] = Field(None, alias="Resource_List")
     comment: Optional[str] = None
     account: Optional[str] = Field(None, alias="Account_Name")
     project: Optional[str] = None
