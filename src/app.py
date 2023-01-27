@@ -8,6 +8,7 @@ from flask import Blueprint, Flask
 from flask_cors import CORS
 
 from src import __description__, __title__, __version__
+from src.api.pbs import blueprint as pbs_blueprint
 from src.settings.ctx import ctx_settings
 from src.settings.config import settings_class, swagger_configs
 
@@ -34,6 +35,7 @@ def setup_app(app):
 
     # initial blueprint wiring
     index = Blueprint("index", __name__)
+    index.register_blueprint(pbs_blueprint)
     app.register_blueprint(index, url_prefix=url_prefix)
 
     spec_template = base_template(
