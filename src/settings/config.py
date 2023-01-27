@@ -1,4 +1,5 @@
 import sys
+from typing import Optional
 
 from pydantic import BaseSettings
 
@@ -15,6 +16,10 @@ class _Settings(BaseSettings):
 
     # OPENAPI supported version
     OPENAPI: str = "3.0.3"
+
+    # scheduler properties
+    SCHED_EXEC_PATH: Optional[str] = None
+    SCHED_SERVER: Optional[str] = None
 
     class Config:
         env_file = ".env"
