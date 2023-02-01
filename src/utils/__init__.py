@@ -1,8 +1,22 @@
 from dataclasses import asdict
+from typing import Dict, Type
 
 from apispec_plugins.types import HTTPResponse
 from flask_restful import abort
+from pydantic import BaseModel
+from pydantic.utils import lenient_issubclass
 from werkzeug.http import HTTP_STATUS_CODES
+
+
+def build_extra(model: Type[BaseModel], values: dict[str, Dict]):
+    for field in model.__fields__.values():
+        if lenient_issubclass(field.type_, BaseModel):
+            build_extra(field.type_, values)
+
+        if field.alias in values:
+            values.pop(field.alias)
+
+    return values
 
 
 def http_response(code: int, description=""):
