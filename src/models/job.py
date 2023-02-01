@@ -6,6 +6,8 @@ from typing import Any, Optional
 from pydantic import BaseModel, Field, root_validator, validator
 from pydantic.utils import lenient_issubclass
 
+from src.utils import build_extra
+
 
 class JobStatus(Enum):
     ARRAY_JOB = "B"
@@ -46,26 +48,23 @@ class _JobNotification(BaseModel):
     on_started: Optional[bool] = None
     on_finished: Optional[bool] = None
     on_aborted: Optional[bool] = None
-    _events: Optional[str] = Field(None, alias="Mail_Points")
+    events: Optional[str] = Field(None, alias="Mail_Points")
 
     @validator("to", pre=True)
     def parse_to(cls, value):
         return value.split(",")
 
-    # @validator("_events", pre=True)
-    # def parse_events(cls, value):
-    #     return value
+    @root_validator
+    def parse_events(cls, values: dict[str, Any]) -> dict[str, Any]:
+        events = values.pop("events", None)
+        if "b" in events:
+            values["on_started"] = True
+        if "e" in events:
+            values["on_finished"] = True
+        if "a" in events:
+            values["on_aborted"] = True
 
-    # class Config:
-    #     underscore_attrs_are_private = True
-
-    # @validator("on_finished", pre=True, allow_reuse=True)
-    # def parse_on_started(cls, value):
-    #     return "e" in value
-    #
-    # @validator("on_aborted", pre=True, allow_reuse=True)
-    # def parse_on_started(cls, value):
-    #     return "a" in value
+        return values
 
 
 class Job(BaseModel):
@@ -113,16 +112,5 @@ class Job(BaseModel):
 
     @root_validator(pre=True)
     def extra_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
-        values["extra"] = cls.extras(cls, deepcopy(values))
-        return values
-
-    @classmethod
-    def extras(cls, model, values):
-        for field in model.__fields__.values():
-            if lenient_issubclass(field.type_, BaseModel):
-                cls.extras(field.type_, values)
-
-            if field.alias in values:
-                values.pop(field.alias)
-
+        values["extra"] = build_extra(cls, deepcopy(values))
         return values
