@@ -1,7 +1,7 @@
 import pytest
 
 from src.services.pbs import PBS
-from src.models.job import Job
+from src.models.job import JobStat, JobSubmit
 
 
 @pytest.fixture(scope="class")
@@ -10,13 +10,16 @@ def pbs():
 
 
 @pytest.fixture(scope="class")
-def job():
-    return Job(
+def job_submit():
+    return JobSubmit(
         name="PBS job",
-        queue="queue",
+        queue="testq",
     )
 
 
 class TestPBS:
-    def test_qsub(self, pbs, job):
-        job.dict(exclude_none=True)
+    def test_qsub(self, pbs, job_submit):
+        job_submit.dict()
+
+    def test_qstat(self, pbs, job_submit):
+        job_submit.dict()
