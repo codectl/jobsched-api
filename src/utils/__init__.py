@@ -1,3 +1,4 @@
+from copy import deepcopy
 from dataclasses import asdict
 from typing import Dict, Type
 
@@ -17,6 +18,26 @@ def build_extra(model: Type[BaseModel], values: dict[str, Dict]):
             values.pop(field.alias)
 
     return values
+
+
+def unflatten(model: Type[BaseModel], values: dict[str, Dict]):
+    values_cp, parsed, objs = deepcopy(values), deepcopy(values), []
+
+    for field in model.__fields__.values():
+        if lenient_issubclass(field.type_, BaseModel):
+            objs.append(field)
+        else:
+            if field.alias in values_cp:
+                parsed[field.alias] = values_cp[field.alias]
+                values_cp.pop(field.alias)
+
+    for field in objs:
+        if field.alias in values_cp:
+            values_cp.update(values_cp[field.alias])
+
+        parsed[field.alias] = unflatten(field.type_, values_cp)
+
+    return parsed
 
 
 def http_response(code: int, description=""):
