@@ -23,13 +23,15 @@ class JobStatus(Enum):
 
 
 class _JobResources(BaseModel):
-    select: str
     mem: Optional[str] = None
     cpu: Optional[int] = Field(None, alias="ncpus")
     gpu: Optional[int] = Field(None, alias="ngpus")
     node_count: Optional[int] = Field(None, alias="nodect")
     place: Optional[str] = None
     walltime: Optional[str] = None
+
+    class Config:
+        allow_population_by_field_name = True
 
 
 class _JobTimeline(BaseModel):
@@ -50,13 +52,16 @@ class _JobNotification(BaseModel):
     on_aborted: Optional[bool] = None
     events: Optional[str] = Field(None, alias="Mail_Points")
 
+    class Config:
+        allow_population_by_field_name = True
+
     @validator("to", pre=True)
     def parse_to(cls, value):
-        return value.split(",")
+        return value.split(",") if isinstance(value, str) else value
 
     @root_validator
     def parse_events(cls, values: dict[str, Any]) -> dict[str, Any]:
-        events = values.pop("events", None)
+        events = values.pop("events") or ""
         if "b" in events:
             values["on_started"] = True
         if "e" in events:
@@ -67,35 +72,38 @@ class _JobNotification(BaseModel):
         return values
 
 
-class Job(BaseModel):
+class JobSubmit(BaseModel):
     """
-    The attributes of a job.
+    The attributes of a job submission.
     For PBS job documentations, see at https://bit.ly/3WG0Mmg.
     """
 
-    job_id: Optional[str] = None
-    name: str = Field(None, alias="Job_Name")
-    owner: Optional[str] = Field(None, alias="Job_Owner")
-    status: Optional[JobStatus] = Field(None, alias="job_state")
+    name: Optional[str] = Field(None, alias="Job_Name")
     queue: Optional[str] = None
-    server: Optional[str] = None
     submit_args: Optional[str] = Field(None, alias="Submit_arguments")
     stdout_path: Optional[str] = Field(None, alias="Output_Path")
     stderr_path: Optional[str] = Field(None, alias="Error_Path")
     resources: Optional[_JobResources] = Field(None, alias="Resource_List")
-    comment: Optional[str] = None
     account: Optional[str] = Field(None, alias="Account_Name")
     project: Optional[str] = None
     priority: Optional[int] = Field(None, alias="Priority")
     interactive: Optional[bool] = None
     rerunable: Optional[bool] = Field(None, alias="Rerunable")
     env: Optional[dict] = Field(None, alias="Variable_List")
-    timeline: Optional[_JobTimeline] = None
     notify_on: Optional[_JobNotification] = None
-    extra: Optional[dict] = None
 
     class Config:
         allow_population_by_field_name = True
+
+
+class JobStat(JobSubmit):
+    job_id: Optional[str] = None
+    owner: Optional[str] = Field(None, alias="Job_Owner")
+    status: Optional[JobStatus] = Field(None, alias="job_state")
+    server: Optional[str] = None
+    comment: Optional[str] = None
+    timeline: Optional[_JobTimeline] = None
+    extra: Optional[dict] = None
 
     @root_validator(pre=True)
     def unflatten(cls, values: dict[str, Any]) -> dict[str, Any]:
@@ -105,8 +113,9 @@ class Job(BaseModel):
         ]
 
         for field in complex_fields:
-            subset = {k: v for k, v in values.items() if k != field.alias}
-            values.setdefault(field.alias, subset)
+            if field.alias in values:
+                subset = {k: v for k, v in values.items() if k != field.alias}
+                values.setdefault(field.alias, subset)
 
         return values
 
