@@ -2,7 +2,7 @@ import abc
 from pathlib import Path
 from typing import Optional, Union
 
-from src.models.job import Job, JobStatus
+from src.models.job import JobStat, JobSubmit, JobStatus
 
 
 class Sched(abc.ABC):
@@ -19,7 +19,7 @@ class Sched(abc.ABC):
         self,
         job_id: str = None,
         status: Union[None, JobStatus, list[JobStatus]] = None,
-    ) -> Union[Job, list[Job]]:
+    ) -> Union[JobStat, list[JobStat]]:
         """
         Check for a job given job properties.
         job_id: the id of the job; if provided, a single job is returned
@@ -28,6 +28,6 @@ class Sched(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def qsub(self, props: Job) -> str:
+    def qsub(self, props: JobSubmit) -> str:
         """Submit a job to the scheduler based on given job properties."""
         raise NotImplementedError
