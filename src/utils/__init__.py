@@ -21,21 +21,21 @@ def build_extra(model: Type[BaseModel], values: dict[str, Dict]):
 
 
 def unflatten(model: Type[BaseModel], values: dict[str, Dict]):
-    values_cp, parsed, objs = deepcopy(values), deepcopy(values), []
+    parsed, objs = deepcopy(values), []
 
     for field in model.__fields__.values():
         if lenient_issubclass(field.type_, BaseModel):
             objs.append(field)
         else:
-            if field.alias in values_cp:
-                parsed[field.alias] = values_cp[field.alias]
-                values_cp.pop(field.alias)
+            if field.alias in values:
+                values.pop(field.alias)
 
     for field in objs:
-        if field.alias in values_cp:
-            values_cp.update(values_cp[field.alias])
+        if field.alias in values:
+            values.update(values[field.alias])
+            values.pop(field.alias)
 
-        parsed[field.alias] = unflatten(field.type_, values_cp)
+        parsed[field.alias] = unflatten(field.type_, values)
 
     return parsed
 
