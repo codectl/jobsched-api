@@ -4,9 +4,8 @@ from enum import Enum
 from typing import Any, Optional
 
 from pydantic import BaseModel, Field, root_validator, validator
-from pydantic.utils import lenient_issubclass
 
-from src.utils import build_extra
+from src.utils import build_extra, unflatten
 
 
 class JobStatus(Enum):
@@ -29,6 +28,14 @@ class _JobResources(BaseModel):
     node_count: Optional[int] = Field(None, alias="nodect")
     place: Optional[str] = None
     walltime: Optional[str] = None
+
+    class Config:
+        allow_population_by_field_name = True
+
+
+class _JobResourcesType(BaseModel):
+    request: Optional[_JobResources] = Field(None, alias="Resource_List")
+    used: Optional[_JobResources] = Field(None, alias="resources_used")
 
     class Config:
         allow_population_by_field_name = True
@@ -83,7 +90,7 @@ class JobSubmit(BaseModel):
     submit_args: Optional[str] = Field(None, alias="Submit_arguments")
     stdout_path: Optional[str] = Field(None, alias="Output_Path")
     stderr_path: Optional[str] = Field(None, alias="Error_Path")
-    resources: Optional[_JobResources] = Field(None, alias="Resource_List")
+    resources: Optional[_JobResources] = None
     account: Optional[str] = Field(None, alias="Account_Name")
     project: Optional[str] = None
     priority: Optional[int] = Field(None, alias="Priority")
@@ -101,23 +108,14 @@ class JobStat(JobSubmit):
     owner: Optional[str] = Field(None, alias="Job_Owner")
     status: Optional[JobStatus] = Field(None, alias="job_state")
     server: Optional[str] = None
+    resources: Optional[_JobResourcesType] = None
     comment: Optional[str] = None
     timeline: Optional[_JobTimeline] = None
     extra: Optional[dict] = None
 
     @root_validator(pre=True)
     def unflatten(cls, values: dict[str, Any]) -> dict[str, Any]:
-        complex_fields = [
-            field for field in cls.__fields__.values()
-            if lenient_issubclass(field.type_, BaseModel)
-        ]
-
-        for field in complex_fields:
-            if field.alias in values:
-                subset = {k: v for k, v in values.items() if k != field.alias}
-                values.setdefault(field.alias, subset)
-
-        return values
+        return unflatten(model=cls, values=values)
 
     @root_validator(pre=True)
     def extra_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
