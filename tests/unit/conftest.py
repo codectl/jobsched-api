@@ -22,8 +22,11 @@ def qsub_data():
         "account": "pbs_account",
         "project": "_pbs_project_default",
         "priority": 0,
-        "interactive": False,
-        "rerunable": True,
+        "flags": {
+            "interactive": False,
+            "rerunable": True,
+            "forward_X11": False,
+        },
         "env": {
             "HOME": "/home/user",
             "SHELL": "/bin/bash",

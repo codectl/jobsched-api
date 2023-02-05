@@ -17,8 +17,9 @@ def test_qsub_deserializer(qsub_job):
     assert job.resources.walltime == "02:00:00"
     assert job.account == "pbs_account"
     assert job.project == "_pbs_project_default"
-    assert job.interactive is False
-    assert job.rerunable is True
+    assert job.flags.interactive is False
+    assert job.flags.rerunable is True
+    assert job.flags.forward_X11 is False
 
 
 def test_qstat_deserializer(qstat_job):
@@ -36,8 +37,9 @@ def test_qstat_deserializer(qstat_job):
     assert job.resources.request.walltime == "24:00:00"
     assert job.account == "pbs_account"
     assert job.project == "_pbs_project_default"
-    assert job.interactive is True
-    assert job.rerunable is False
+    assert job.flags.interactive is True
+    assert job.flags.rerunable is False
+    assert job.flags.forward_X11 is True
 
     # qstat fields
     assert job.owner == "testu"
