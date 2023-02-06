@@ -56,3 +56,10 @@ def test_qstat_deserializer(qstat_job):
     assert job.timeline.queued_at == datetime(2023, 2, 3, 10, 41, 53)
     assert job.timeline.ready_at == datetime(2023, 2, 3, 10, 41, 53)
     assert isinstance(job.extra, dict) is True
+
+
+def test_job_qsub_clause(qsub_job):
+    qsub = "-N STDIN -q testq -o /tmp/STDIN.o1 -e /tmp/STDIN.e1 " \
+           "-p 0 -A pbs_account -P _pbs_project_default -I -r y -X " \
+           "-l 2:ncpus=5:ngpus=2:mem=10gb -l place=pack -l walltime=02:00:00"
+    assert qsub_job.to_qsub() == qsub
