@@ -144,7 +144,7 @@ class JobSubmit(Job):
         if self.stderr_path is not None:
             args.append(("-e", self.stderr_path))
         if self.priority is not None:
-            args.append(("-p", self.priority))
+            args.append(("-p", str(self.priority)))
         if self.account is not None:
             args.append(("-A", self.account))
         if self.project is not None:
@@ -175,13 +175,15 @@ class JobSubmit(Job):
         # resources
         select = []
         if self.resources.node_count is not None:
-            select.append((self.resources.node_count, ""))
+            select.append((str(self.resources.node_count), ""))
         if self.resources.cpu is not None:
-            select.append(("ncpus", self.resources.cpu))
+            select.append(("ncpus", str(self.resources.cpu)))
         if self.resources.gpu is not None:
-            select.append(("ngpus", self.resources.gpu))
+            select.append(("ngpus", str(self.resources.gpu)))
         if self.resources.mem is not None:
             select.append(("mem", self.resources.mem))
+        print(args)
+        print(select)
         args.append(("-l", ":".join((("=" if s[1] else "").join(s) for s in select))))
 
         if self.resources.place is not None:
@@ -189,4 +191,4 @@ class JobSubmit(Job):
         if self.resources.walltime is not None:
             args.append(("-l", f"walltime={self.resources.walltime}"))
 
-        return "".join((" " if arg[1] else "").join(arg) for arg in args)
+        return " ".join((" " if arg[1] else "").join(arg) for arg in args)
