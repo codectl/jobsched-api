@@ -47,7 +47,7 @@ def qstat_data():
         "resources_used": {
             "cpupercent": 0,
             "cput": "00:00:00",
-            "mem": "18492kb",
+            "mem": "32gb",
             "ncpus": 24,
             "vmem": "187288kb",
             "walltime": "00:02:00"
