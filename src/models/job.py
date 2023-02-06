@@ -22,22 +22,21 @@ class JobStatus(Enum):
     SUSPEND = "S"
 
 
-class _JobResources(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
+class _JobModel(BaseModel, allow_population_by_field_name=True):
+    pass
 
+
+class _JobResources(_JobModel):
     mem: Optional[str] = None
     cpu: Optional[int] = Field(None, alias="ncpus")
     gpu: Optional[int] = Field(None, alias="ngpus")
     node_count: Optional[int] = Field(None, alias="nodect")
+    select: Optional[str] = None
     place: Optional[str] = None
     walltime: Optional[str] = None
 
 
-class _JobResourcesType(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
-
+class _JobResourcesType(_JobModel):
     request: Optional[_JobResources] = Field(None, alias="Resource_List")
     used: Optional[_JobResources] = Field(None, alias="resources_used")
 
@@ -53,10 +52,7 @@ class _JobTimeline(BaseModel):
         return datetime.strptime(value, "%a %b %d %H:%M:%S %Y")
 
 
-class _JobNotification(BaseModel):
-    class Config:
-        allow_population_by_field_name = True
-
+class _JobNotification(_JobModel):
     to: Optional[list[str]] = Field(None, alias="Mail_Users")
     on_started: Optional[bool] = None
     on_finished: Optional[bool] = None
@@ -80,39 +76,37 @@ class _JobNotification(BaseModel):
         return values
 
 
-class _JobFlags(BaseModel):
+class _JobFlags(_JobModel):
     interactive: Optional[bool] = None
     rerunable: Optional[bool] = Field(None, alias="Rerunable")
+    copy_env: Optional[bool] = Field(None, alias="forward_x11_port")
     forward_X11: Optional[bool] = Field(None, alias="forward_x11_port")
 
-    class Config:
-        allow_population_by_field_name = True
+
+class _JobExtra(_JobModel):
+    account: Optional[str] = Field(None, alias="Account_Name")
+    project: Optional[str] = None
+    priority: Optional[int] = Field(None, alias="Priority")
+    flags: Optional[_JobFlags] = None
+    notify_on: Optional[_JobNotification] = None
+    env: Optional[dict] = Field(None, alias="Variable_List")
 
 
-class Job(BaseModel, ABC):
+class Job(_JobModel, ABC):
     """
     The attributes of a job.
     For PBS job documentations, see at https://bit.ly/3WG0Mmg.
     """
-
-    class Config:
-        allow_population_by_field_name = True
-
     name: Optional[str] = Field(None, alias="Job_Name")
     queue: Optional[str] = None
     submit_args: Optional[str] = Field(None, alias="Submit_arguments")
     stdout_path: Optional[str] = Field(None, alias="Output_Path")
     stderr_path: Optional[str] = Field(None, alias="Error_Path")
     resources: Optional[_JobResources] = None
-    account: Optional[str] = Field(None, alias="Account_Name")
-    project: Optional[str] = None
-    priority: Optional[int] = Field(None, alias="Priority")
-    flags: Optional[_JobFlags] = None
-    env: Optional[dict] = Field(None, alias="Variable_List")
-    notify_on: Optional[_JobNotification] = None
+    extra: Optional[_JobExtra] = None
 
 
-class JobStat(Job):
+class JobStat(Job, _JobExtra):
     job_id: Optional[str] = None
     owner: Optional[str] = Field(None, alias="Job_Owner")
     status: Optional[JobStatus] = Field(None, alias="job_state")
@@ -135,6 +129,16 @@ class JobStat(Job):
 class JobSubmit(Job):
     def to_qsub(self) -> str:
         args: list[(str, str)] = []
+
+        # flags
+        if self.extra.flags.interactive is not None:
+            args.append(("-I", ""))
+        if self.extra.flags.rerunable is not None:
+            args.append(("-r", "y" if self.extra.flags.rerunable else "n"))
+        if self.extra.flags.forward_X11 is not None:
+            args.append(("-X", ""))
+
+        # args
         if self.name is not None:
             args.append(("-N", self.name))
         if self.queue is not None:
@@ -143,50 +147,43 @@ class JobSubmit(Job):
             args.append(("-o", self.stdout_path))
         if self.stderr_path is not None:
             args.append(("-e", self.stderr_path))
-        if self.priority is not None:
-            args.append(("-p", str(self.priority)))
-        if self.account is not None:
-            args.append(("-A", self.account))
-        if self.project is not None:
-            args.append(("-P", self.project))
-
-        # flags
-        if self.flags.interactive is not None:
-            args.append(("-I", ""))
-        if self.flags.rerunable is not None:
-            args.append(("-r", "y" if self.flags.rerunable else "n"))
-        if self.flags.forward_X11 is not None:
-            args.append(("-X", ""))
-
-        # email notification
-        if self.notify_on is not None:
-            email_to = self.notify_on.to
-            events = ""
-            args.append(("-M", ", ".join(email_to)))
-            if self.notify_on.on_started:
-                events += "b"
-            if self.notify_on.on_finished:
-                events += "e"
-            if self.notify_on.on_aborted:
-                events += "a"
-            if events:
-                args.append(("-m", events))
 
         # resources
-        select = []
-        if self.resources.node_count is not None:
-            select.append((str(self.resources.node_count), ""))
+        if self.resources.place is not None:
+            args.append(("-l", f"nodect={self.resources.node_count}"))
         if self.resources.cpu is not None:
-            select.append(("ncpus", str(self.resources.cpu)))
+            args.append(("-l", f"ncpus={self.resources.cpu}"))
         if self.resources.gpu is not None:
-            select.append(("ngpus", str(self.resources.gpu)))
+            args.append(("-l", f"ngpus={self.resources.gpu}"))
         if self.resources.mem is not None:
-            select.append(("mem", self.resources.mem))
-        args.append(("-l", ":".join((("=" if s[1] else "").join(s) for s in select))))
-
+            args.append(("-l", f"mem={self.resources.mem}"))
+        if self.resources.select is not None:
+            args.append(("-l", f"select={self.resources.select}"))
         if self.resources.place is not None:
             args.append(("-l", f"place={self.resources.place}"))
         if self.resources.walltime is not None:
             args.append(("-l", f"walltime={self.resources.walltime}"))
+
+        # extra
+        if self.extra.account is not None:
+            args.append(("-A", self.extra.account))
+        if self.extra.project is not None:
+            args.append(("-P", self.extra.project))
+        if self.extra.priority is not None:
+            args.append(("-p", str(self.extra.priority)))
+
+        # extra - email notification
+        if self.extra.notify_on is not None:
+            email_to = self.extra.notify_on.to
+            events = ""
+            args.append(("-M", ", ".join(email_to)))
+            if self.extra.notify_on.on_started:
+                events += "b"
+            if self.extra.notify_on.on_finished:
+                events += "e"
+            if self.extra.notify_on.on_aborted:
+                events += "a"
+            if events:
+                args.append(("-m", events))
 
         return " ".join((" " if arg[1] else "").join(arg) for arg in args)
