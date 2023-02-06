@@ -182,8 +182,6 @@ class JobSubmit(Job):
             select.append(("ngpus", str(self.resources.gpu)))
         if self.resources.mem is not None:
             select.append(("mem", self.resources.mem))
-        print(args)
-        print(select)
         args.append(("-l", ":".join((("=" if s[1] else "").join(s) for s in select))))
 
         if self.resources.place is not None:
