@@ -65,5 +65,6 @@ def test_job_qsub_clause(qsub_job):
     qsub = "-I -r y -X -N STDIN -q testq -o /tmp/STDIN.o1 -e /tmp/STDIN.e1 " \
            "-l nodect=2 -l ncpus=5 -l ngpus=2 -l mem=10gb " \
            "-l place=pack -l walltime=02:00:00 " \
-           "-A pbs_account -P _pbs_project_default -p 0"
+           "-A pbs_account -P _pbs_project_default -p 0 " \
+           "-v HOME=/home/user, SHELL=/bin/bash"
     assert qsub_job.to_qsub() == qsub

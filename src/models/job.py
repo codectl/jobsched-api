@@ -81,12 +81,14 @@ class _JobFlags(_JobModel):
     rerunable: Optional[bool] = Field(None, alias="Rerunable")
     copy_env: Optional[bool] = Field(None, alias="forward_x11_port")
     forward_X11: Optional[bool] = Field(None, alias="forward_x11_port")
+    array: Optional[bool] = None
 
 
 class _JobExtra(_JobModel):
     account: Optional[str] = Field(None, alias="Account_Name")
     project: Optional[str] = None
     priority: Optional[int] = Field(None, alias="Priority")
+    job_array: Optional[str] = None
     flags: Optional[_JobFlags] = None
     notify_on: Optional[_JobNotification] = None
     env: Optional[dict] = Field(None, alias="Variable_List")
@@ -171,6 +173,8 @@ class JobSubmit(Job):
             args.append(("-P", self.extra.project))
         if self.extra.priority is not None:
             args.append(("-p", str(self.extra.priority)))
+        if self.extra.job_array is not None:
+            args.append(("-J", self.extra.job_array))
 
         # extra - email notification
         if self.extra.notify_on is not None:
@@ -185,5 +189,10 @@ class JobSubmit(Job):
                 events += "a"
             if events:
                 args.append(("-m", events))
+
+        # extra - env
+        if self.extra.env is not None:
+            values = (f"{k}={v}" for k, v in self.extra.env.items())
+            args.append(("-v", ", ".join(values)))
 
         return " ".join((" " if arg[1] else "").join(arg) for arg in args)
