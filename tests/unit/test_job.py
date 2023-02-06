@@ -16,11 +16,13 @@ def test_qsub_deserializer(qsub_job):
     assert job.resources.node_count == 2
     assert job.resources.place == "pack"
     assert job.resources.walltime == "02:00:00"
-    assert job.account == "pbs_account"
-    assert job.project == "_pbs_project_default"
-    assert job.flags.interactive is False
-    assert job.flags.rerunable is True
-    assert job.flags.forward_X11 is False
+    assert job.extra.account == "pbs_account"
+    assert job.extra.project == "_pbs_project_default"
+    assert job.extra.flags.interactive is False
+    assert job.extra.flags.rerunable is True
+    assert job.extra.flags.forward_X11 is False
+    assert job.extra.flags.copy_env is False
+    assert job.extra.env == {"HOME": "/home/user", "SHELL": "/bin/bash"}
 
 
 def test_qstat_deserializer(qstat_job):
@@ -56,10 +58,12 @@ def test_qstat_deserializer(qstat_job):
     assert job.timeline.queued_at == datetime(2023, 2, 3, 10, 41, 53)
     assert job.timeline.ready_at == datetime(2023, 2, 3, 10, 41, 53)
     assert isinstance(job.extra, dict) is True
+    assert isinstance(job.env, dict) is True
 
 
 def test_job_qsub_clause(qsub_job):
-    qsub = "-N STDIN -q testq -o /tmp/STDIN.o1 -e /tmp/STDIN.e1 " \
-           "-p 0 -A pbs_account -P _pbs_project_default -I -r y -X " \
-           "-l 2:ncpus=5:ngpus=2:mem=10gb -l place=pack -l walltime=02:00:00"
+    qsub = "-I -r y -X -N STDIN -q testq -o /tmp/STDIN.o1 -e /tmp/STDIN.e1 " \
+           "-l nodect=2 -l ncpus=5 -l ngpus=2 -l mem=10gb " \
+           "-l place=pack -l walltime=02:00:00 " \
+           "-A pbs_account -P _pbs_project_default -p 0"
     assert qsub_job.to_qsub() == qsub

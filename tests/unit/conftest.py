@@ -19,17 +19,20 @@ def qsub_data():
             "place": "pack",
             "walltime": "02:00:00",
         },
-        "account": "pbs_account",
-        "project": "_pbs_project_default",
-        "priority": 0,
-        "flags": {
-            "interactive": False,
-            "rerunable": True,
-            "forward_X11": False,
-        },
-        "env": {
-            "HOME": "/home/user",
-            "SHELL": "/bin/bash",
+        "extra": {
+            "account": "pbs_account",
+            "project": "_pbs_project_default",
+            "priority": 0,
+            "flags": {
+                "interactive": False,
+                "rerunable": True,
+                "forward_X11": False,
+                "copy_env": False,
+            },
+            "env": {
+                "HOME": "/home/user",
+                "SHELL": "/bin/bash",
+            }
         }
     }
 
