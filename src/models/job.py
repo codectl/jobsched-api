@@ -79,10 +79,17 @@ class _JobNotification(_JobModel):
 class _JobFlags(_JobModel):
     interactive: Optional[bool] = None
     rerunable: Optional[bool] = Field(None, alias="Rerunable")
-    copy_env: Optional[bool] = Field(None, alias="forward_x11_port")
+    copy_env: Optional[bool] = None
     forward_X11: Optional[bool] = Field(None, alias="forward_x11_port")
     hold: Optional[bool] = None
     array: Optional[bool] = None
+
+
+class _JobPaths(_JobModel):
+    stdout: Optional[str] = Field(None, alias="Output_Path")
+    stderr: Optional[str] = Field(None, alias="Error_Path")
+    join_mode: Optional[str] = Field(None, alias="Join_Path")
+    shell: Optional[str] = Field(None, alias="Shell_Path_List")
 
 
 class _JobExtra(_JobModel):
@@ -92,9 +99,9 @@ class _JobExtra(_JobModel):
     account: Optional[str] = Field(None, alias="Account_Name")
     project: Optional[str] = None
     priority: Optional[int] = Field(None, alias="Priority")
-    array_range: Optional[str] = Field(None, alias="array_indices_submitted")
     flags: Optional[_JobFlags] = None
     notify_on: Optional[_JobNotification] = None
+    array_range: Optional[str] = Field(None, alias="array_indices_submitted")
     env: Optional[dict] = Field(None, alias="Variable_List")
 
 
@@ -106,9 +113,8 @@ class Job(_JobModel, ABC):
     name: Optional[str] = Field(None, alias="Job_Name")
     queue: Optional[str] = None
     submit_args: Optional[str] = Field(None, alias="Submit_arguments")
-    stdout_path: Optional[str] = Field(None, alias="Output_Path")
-    stderr_path: Optional[str] = Field(None, alias="Error_Path")
     resources: Optional[_JobResources] = None
+    paths: Optional[_JobPaths] = None
     extra: Optional[_JobExtra] = None
 
 
@@ -120,6 +126,7 @@ class JobStat(Job, _JobExtra):
     resources: Optional[_JobResourcesType] = None
     comment: Optional[str] = None
     timeline: Optional[_JobTimeline] = None
+    hold_type: Optional[str] = Field(None, alias="Hold_Types")
     extra: Optional[dict] = None
 
     @root_validator(pre=True)
@@ -151,10 +158,6 @@ class JobSubmit(Job):
             args.append(("-N", self.name))
         if self.queue is not None:
             args.append(("-q", self.queue))
-        if self.stdout_path is not None:
-            args.append(("-o", self.stdout_path))
-        if self.stderr_path is not None:
-            args.append(("-e", self.stderr_path))
 
         # resources
         if self.resources.place is not None:
@@ -172,15 +175,30 @@ class JobSubmit(Job):
         if self.resources.walltime is not None:
             args.append(("-l", f"walltime={self.resources.walltime}"))
 
+        # paths
+        if self.paths is not None:
+            if self.paths.stdout is not None:
+                args.append(("-o", self.paths.stdout))
+            if self.paths.stderr is not None:
+                args.append(("-e", self.paths.stderr))
+            if self.paths.shell is not None:
+                args.append(("-S", self.paths.shell))
+            if self.paths.join_mode is None and self.paths.stderr is None:
+                # redirect stderr to stdout if mode is not specified
+                args.append(("-j", "oe"))
+            elif self.paths.join_mode is not None:
+                args.append(("-j", self.paths.join_mode))
+
         # extra
-        if self.extra.account is not None:
-            args.append(("-A", self.extra.account))
-        if self.extra.project is not None:
-            args.append(("-P", self.extra.project))
-        if self.extra.priority is not None:
-            args.append(("-p", str(self.extra.priority)))
-        if self.extra.array_range is not None:
-            args.append(("-J", self.extra.array_range))
+        if self.extra is not None:
+            if self.extra.account is not None:
+                args.append(("-A", self.extra.account))
+            if self.extra.project is not None:
+                args.append(("-P", self.extra.project))
+            if self.extra.priority is not None:
+                args.append(("-p", str(self.extra.priority)))
+            if self.extra.array_range is not None:
+                args.append(("-J", self.extra.array_range))
 
         # extra - email notification
         if self.extra.notify_on is not None:
@@ -206,5 +224,7 @@ class JobSubmit(Job):
                          k not in self.extra.__fields__))
         if extras:
             args.append(("-W", ", ".join(extras)))
+
+        # TODO submit args
 
         return " ".join((" " if arg[1] else "").join(arg) for arg in args)

@@ -9,8 +9,6 @@ def qsub_data():
         "name": "STDIN",
         "queue": "testq",
         "submit_args": "-- /bin/sleep 1000",
-        "stdout_path": "/tmp/STDIN.o1",
-        "stderr_path": "/tmp/STDIN.e1",
         "resources": {
             "mem": "10gb",
             "cpu": 5,
@@ -18,6 +16,11 @@ def qsub_data():
             "node_count": 2,
             "place": "pack",
             "walltime": "02:00:00",
+        },
+        "paths": {
+            "stdout": "/tmp/STDIN.o1",
+            "stderr": "/tmp/STDIN.e1",
+            "join_mode": "oe",
         },
         "extra": {
             "account": "pbs_account",
