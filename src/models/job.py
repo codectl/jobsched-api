@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import BaseModel, Field, root_validator, validator
+from pydantic import BaseModel, Extra, Field, root_validator, validator
 
 from src.utils import build_extra, unflatten
 
@@ -81,14 +81,18 @@ class _JobFlags(_JobModel):
     rerunable: Optional[bool] = Field(None, alias="Rerunable")
     copy_env: Optional[bool] = Field(None, alias="forward_x11_port")
     forward_X11: Optional[bool] = Field(None, alias="forward_x11_port")
+    hold: Optional[bool] = None
     array: Optional[bool] = None
 
 
 class _JobExtra(_JobModel):
+    class Config:
+        extra = Extra.allow
+
     account: Optional[str] = Field(None, alias="Account_Name")
     project: Optional[str] = None
     priority: Optional[int] = Field(None, alias="Priority")
-    job_array: Optional[str] = None
+    array_range: Optional[str] = Field(None, alias="array_indices_submitted")
     flags: Optional[_JobFlags] = None
     notify_on: Optional[_JobNotification] = None
     env: Optional[dict] = Field(None, alias="Variable_List")
@@ -139,6 +143,8 @@ class JobSubmit(Job):
             args.append(("-r", "y" if self.extra.flags.rerunable else "n"))
         if self.extra.flags.forward_X11 is not None:
             args.append(("-X", ""))
+        if self.extra.flags.hold is not None:
+            args.append(("-h", ""))
 
         # args
         if self.name is not None:
@@ -173,14 +179,14 @@ class JobSubmit(Job):
             args.append(("-P", self.extra.project))
         if self.extra.priority is not None:
             args.append(("-p", str(self.extra.priority)))
-        if self.extra.job_array is not None:
-            args.append(("-J", self.extra.job_array))
+        if self.extra.array_range is not None:
+            args.append(("-J", self.extra.array_range))
 
         # extra - email notification
         if self.extra.notify_on is not None:
-            email_to = self.extra.notify_on.to
             events = ""
-            args.append(("-M", ", ".join(email_to)))
+            if self.extra.notify_on.to is not None:
+                args.append(("-M", ", ".join(self.extra.notify_on.to)))
             if self.extra.notify_on.on_started:
                 events += "b"
             if self.extra.notify_on.on_finished:
@@ -194,5 +200,11 @@ class JobSubmit(Job):
         if self.extra.env is not None:
             values = (f"{k}={v}" for k, v in self.extra.env.items())
             args.append(("-v", ", ".join(values)))
+
+        # extra - extra attrs
+        vars_ = vars(self.extra).items()
+        extras = {f"{k}={str(v)}" for k, v in vars_ if k not in self.extra.__fields__}
+        if extras:
+            args.append(("-W", ", ".join(extras)))
 
         return " ".join((" " if arg[1] else "").join(arg) for arg in args)

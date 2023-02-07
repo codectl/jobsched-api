@@ -29,10 +29,17 @@ def qsub_data():
                 "forward_X11": False,
                 "copy_env": False,
             },
+            "notify_on": {
+                "to": ["testu@email.com"],
+                "on_started": True,
+                "on_finished": True,
+            },
             "env": {
                 "HOME": "/home/user",
                 "SHELL": "/bin/bash",
-            }
+            },
+            "block": True,
+            "umask": 33,
         }
     }
 

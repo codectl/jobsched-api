@@ -23,6 +23,7 @@ def test_qsub_deserializer(qsub_job):
     assert job.extra.flags.forward_X11 is False
     assert job.extra.flags.copy_env is False
     assert job.extra.env == {"HOME": "/home/user", "SHELL": "/bin/bash"}
+    assert job.extra.block is True
 
 
 def test_qstat_deserializer(qstat_job):
@@ -66,5 +67,7 @@ def test_job_qsub_clause(qsub_job):
            "-l nodect=2 -l ncpus=5 -l ngpus=2 -l mem=10gb " \
            "-l place=pack -l walltime=02:00:00 " \
            "-A pbs_account -P _pbs_project_default -p 0 " \
-           "-v HOME=/home/user, SHELL=/bin/bash"
+           "-M testu@email.com -m be " \
+           "-v HOME=/home/user, SHELL=/bin/bash " \
+           "-W block=True, umask=33"
     assert qsub_job.to_qsub() == qsub
