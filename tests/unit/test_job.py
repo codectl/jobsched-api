@@ -18,9 +18,9 @@ def test_qsub_deserializer(qsub_job):
     assert job.resources.walltime == "02:00:00"
     assert job.extra.account == "pbs_account"
     assert job.extra.project == "_pbs_project_default"
-    assert job.extra.flags.interactive is False
+    assert job.extra.flags.interactive is True
     assert job.extra.flags.rerunable is True
-    assert job.extra.flags.forward_X11 is False
+    assert job.extra.flags.forward_X11 is True
     assert job.extra.flags.copy_env is False
     assert job.extra.env == {"HOME": "/home/user", "SHELL": "/bin/bash"}
     assert job.extra.block is True

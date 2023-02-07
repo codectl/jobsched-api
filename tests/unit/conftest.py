@@ -24,9 +24,9 @@ def qsub_data():
             "project": "_pbs_project_default",
             "priority": 0,
             "flags": {
-                "interactive": False,
+                "interactive": True,
                 "rerunable": True,
-                "forward_X11": False,
+                "forward_X11": True,
                 "copy_env": False,
             },
             "notify_on": {

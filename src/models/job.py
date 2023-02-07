@@ -137,13 +137,13 @@ class JobSubmit(Job):
         args: list[(str, str)] = []
 
         # flags
-        if self.extra.flags.interactive is not None:
+        if self.extra.flags.interactive:
             args.append(("-I", ""))
         if self.extra.flags.rerunable is not None:
             args.append(("-r", "y" if self.extra.flags.rerunable else "n"))
-        if self.extra.flags.forward_X11 is not None:
+        if self.extra.flags.forward_X11:
             args.append(("-X", ""))
-        if self.extra.flags.hold is not None:
+        if self.extra.flags.hold:
             args.append(("-h", ""))
 
         # args
@@ -202,8 +202,8 @@ class JobSubmit(Job):
             args.append(("-v", ", ".join(values)))
 
         # extra - extra attrs
-        vars_ = vars(self.extra).items()
-        extras = {f"{k}={str(v)}" for k, v in vars_ if k not in self.extra.__fields__}
+        extras = sorted(("=".join((k, str(v))) for k, v in vars(self.extra).items() if
+                         k not in self.extra.__fields__))
         if extras:
             args.append(("-W", ", ".join(extras)))
 
