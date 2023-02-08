@@ -74,5 +74,6 @@ def test_job_qsub_clause(qsub_job):
            "-o /tmp/STDIN.o1 -e /tmp/STDIN.e1 -j oe " \
            "-M testu@email.com -m be " \
            "-v HOME=/home/user, SHELL=/bin/bash " \
-           "-W block=True, umask=33"
+           "-W block=True, umask=33 " \
+            "-- /bin/sleep 1000"
     assert qsub_job.to_qsub() == qsub

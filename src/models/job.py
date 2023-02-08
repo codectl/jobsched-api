@@ -242,9 +242,8 @@ class JobSubmit(Job):
             # make flags come first
             if self.extra.flags is not None:
                 args = self.extra.flags.parse_args() + args
-
-        # TODO submit args
-
+        if self.submit_args is not None:
+            args.append(("--", self.submit_args.lstrip("- ")))
         return args
 
     def to_qsub(self):
