@@ -6,7 +6,7 @@ from src.models.job import JobStat, JobSubmit
 
 @pytest.fixture(scope="class")
 def pbs():
-    return PBS
+    return PBS()
 
 
 @pytest.fixture(scope="class")
