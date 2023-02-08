@@ -17,15 +17,15 @@ def qsub_data():
             "place": "pack",
             "walltime": "02:00:00",
         },
-        "paths": {
-            "stdout": "/tmp/STDIN.o1",
-            "stderr": "/tmp/STDIN.e1",
-            "join_mode": "oe",
-        },
         "extra": {
+            "priority": 0,
             "account": "pbs_account",
             "project": "_pbs_project_default",
-            "priority": 0,
+            "paths": {
+                "stdout": "/tmp/STDIN.o1",
+                "stderr": "/tmp/STDIN.e1",
+                "join_mode": "oe",
+            },
             "flags": {
                 "interactive": True,
                 "rerunable": True,

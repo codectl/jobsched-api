@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from copy import deepcopy
 from datetime import datetime
 from enum import Enum
@@ -22,21 +22,42 @@ class JobStatus(Enum):
     SUSPEND = "S"
 
 
-class _JobModel(BaseModel, allow_population_by_field_name=True):
-    pass
+class _JobModel(BaseModel, ABC, allow_population_by_field_name=True):
+
+    @abstractmethod
+    def parse_args(self) -> list[(str, Optional[str])]:
+        raise NotImplementedError
 
 
 class _JobResources(_JobModel):
+    node_count: Optional[int] = Field(None, alias="nodect")
     mem: Optional[str] = None
     cpu: Optional[int] = Field(None, alias="ncpus")
     gpu: Optional[int] = Field(None, alias="ngpus")
-    node_count: Optional[int] = Field(None, alias="nodect")
     select: Optional[str] = None
     place: Optional[str] = None
     walltime: Optional[str] = None
 
+    def parse_args(self):
+        args = []
+        if self.node_count is not None:
+            args.append(("-l", f"nodect={self.node_count}"))
+        if self.cpu is not None:
+            args.append(("-l", f"ncpus={self.cpu}"))
+        if self.gpu is not None:
+            args.append(("-l", f"ngpus={self.gpu}"))
+        if self.mem is not None:
+            args.append(("-l", f"mem={self.mem}"))
+        if self.select is not None:
+            args.append(("-l", f"select={self.select}"))
+        if self.place is not None:
+            args.append(("-l", f"place={self.place}"))
+        if self.walltime is not None:
+            args.append(("-l", f"walltime={self.walltime}"))
+        return args
 
-class _JobResourcesType(_JobModel):
+
+class _JobResourcesType(BaseModel):
     request: Optional[_JobResources] = Field(None, alias="Resource_List")
     used: Optional[_JobResources] = Field(None, alias="resources_used")
 
@@ -50,6 +71,51 @@ class _JobTimeline(BaseModel):
     @validator("*", pre=True)
     def parse_date(cls, value):
         return datetime.strptime(value, "%a %b %d %H:%M:%S %Y")
+
+
+class _JobPaths(_JobModel):
+    stdout: Optional[str] = Field(None, alias="Output_Path")
+    stderr: Optional[str] = Field(None, alias="Error_Path")
+    join_mode: Optional[str] = Field(None, alias="Join_Path")
+    shell: Optional[str] = Field(None, alias="Shell_Path_List")
+
+    def parse_args(self):
+        args = []
+        if self.stdout is not None:
+            args.append(("-o", self.stdout))
+        if self.stderr is not None:
+            args.append(("-e", self.stderr))
+        if self.shell is not None:
+            args.append(("-S", self.shell))
+        if self.join_mode is None and self.stderr is None:
+            # redirect stderr to stdout if mode is not specified
+            args.append(("-j", "oe"))
+        elif self.join_mode is not None:
+            args.append(("-j", self.join_mode))
+        return args
+
+
+class _JobFlags(_JobModel):
+    interactive: Optional[bool] = None
+    rerunable: Optional[bool] = Field(None, alias="Rerunable")
+    copy_env: Optional[bool] = None
+    forward_X11: Optional[bool] = Field(None, alias="forward_x11_port")
+    hold: Optional[bool] = None
+    array: Optional[bool] = None
+
+    def parse_args(self):
+        args = []
+        if self.interactive:
+            args.append(("-I",))
+        if self.rerunable is not None:
+            args.append(("-r", "y" if self.rerunable else "n"))
+        if self.copy_env is not None:
+            args.append(("-V",))
+        if self.forward_X11:
+            args.append(("-X",))
+        if self.hold:
+            args.append(("-h",))
+        return args
 
 
 class _JobNotification(_JobModel):
@@ -75,34 +141,57 @@ class _JobNotification(_JobModel):
 
         return values
 
-
-class _JobFlags(_JobModel):
-    interactive: Optional[bool] = None
-    rerunable: Optional[bool] = Field(None, alias="Rerunable")
-    copy_env: Optional[bool] = None
-    forward_X11: Optional[bool] = Field(None, alias="forward_x11_port")
-    hold: Optional[bool] = None
-    array: Optional[bool] = None
-
-
-class _JobPaths(_JobModel):
-    stdout: Optional[str] = Field(None, alias="Output_Path")
-    stderr: Optional[str] = Field(None, alias="Error_Path")
-    join_mode: Optional[str] = Field(None, alias="Join_Path")
-    shell: Optional[str] = Field(None, alias="Shell_Path_List")
+    def parse_args(self):
+        args, events = [], ""
+        if self.to is not None:
+            args.append(("-M", ", ".join(self.to)))
+        if self.on_started:
+            events += "b"
+        if self.on_finished:
+            events += "e"
+        if self.on_aborted:
+            events += "a"
+        if events:
+            args.append(("-m", events))
+        return args
 
 
 class _JobExtra(_JobModel):
     class Config:
         extra = Extra.allow
 
+    priority: Optional[int] = Field(None, alias="Priority")
     account: Optional[str] = Field(None, alias="Account_Name")
     project: Optional[str] = None
-    priority: Optional[int] = Field(None, alias="Priority")
+    paths: Optional[_JobPaths] = None
     flags: Optional[_JobFlags] = None
     notify_on: Optional[_JobNotification] = None
     array_range: Optional[str] = Field(None, alias="array_indices_submitted")
     env: Optional[dict] = Field(None, alias="Variable_List")
+
+    def parse_args(self):
+        args = []
+        if self.priority is not None:
+            args.append(("-p", str(self.priority)))
+        if self.account is not None:
+            args.append(("-A", self.account))
+        if self.project is not None:
+            args.append(("-P", self.project))
+        if self.paths is not None:
+            args += self.paths.parse_args()
+        if self.notify_on is not None:
+            args += self.notify_on.parse_args()
+        if self.array_range is not None:
+            args.append(("-J", self.array_range))
+        if self.env is not None:
+            values = (f"{k}={v}" for k, v in self.env.items())
+            args.append(("-v", ", ".join(values)))
+        # extra attrs
+        vrs = vars(self).items()
+        extras = ("=".join((k, str(v))) for k, v in vrs if k not in self.__fields__)
+        if extras:
+            args.append(("-W", ", ".join(sorted(extras))))
+        return args
 
 
 class Job(_JobModel, ABC):
@@ -114,7 +203,6 @@ class Job(_JobModel, ABC):
     queue: Optional[str] = None
     submit_args: Optional[str] = Field(None, alias="Submit_arguments")
     resources: Optional[_JobResources] = None
-    paths: Optional[_JobPaths] = None
     extra: Optional[_JobExtra] = None
 
 
@@ -140,91 +228,25 @@ class JobStat(Job, _JobExtra):
 
 
 class JobSubmit(Job):
-    def to_qsub(self) -> str:
-        args: list[(str, str)] = []
 
-        # flags
-        if self.extra.flags.interactive:
-            args.append(("-I", ""))
-        if self.extra.flags.rerunable is not None:
-            args.append(("-r", "y" if self.extra.flags.rerunable else "n"))
-        if self.extra.flags.forward_X11:
-            args.append(("-X", ""))
-        if self.extra.flags.hold:
-            args.append(("-h", ""))
-
-        # args
+    def parse_args(self):
+        args = []
         if self.name is not None:
             args.append(("-N", self.name))
         if self.queue is not None:
             args.append(("-q", self.queue))
-
-        # resources
-        if self.resources.place is not None:
-            args.append(("-l", f"nodect={self.resources.node_count}"))
-        if self.resources.cpu is not None:
-            args.append(("-l", f"ncpus={self.resources.cpu}"))
-        if self.resources.gpu is not None:
-            args.append(("-l", f"ngpus={self.resources.gpu}"))
-        if self.resources.mem is not None:
-            args.append(("-l", f"mem={self.resources.mem}"))
-        if self.resources.select is not None:
-            args.append(("-l", f"select={self.resources.select}"))
-        if self.resources.place is not None:
-            args.append(("-l", f"place={self.resources.place}"))
-        if self.resources.walltime is not None:
-            args.append(("-l", f"walltime={self.resources.walltime}"))
-
-        # paths
-        if self.paths is not None:
-            if self.paths.stdout is not None:
-                args.append(("-o", self.paths.stdout))
-            if self.paths.stderr is not None:
-                args.append(("-e", self.paths.stderr))
-            if self.paths.shell is not None:
-                args.append(("-S", self.paths.shell))
-            if self.paths.join_mode is None and self.paths.stderr is None:
-                # redirect stderr to stdout if mode is not specified
-                args.append(("-j", "oe"))
-            elif self.paths.join_mode is not None:
-                args.append(("-j", self.paths.join_mode))
-
-        # extra
+        if self.resources is not None:
+            args += self.resources.parse_args()
         if self.extra is not None:
-            if self.extra.account is not None:
-                args.append(("-A", self.extra.account))
-            if self.extra.project is not None:
-                args.append(("-P", self.extra.project))
-            if self.extra.priority is not None:
-                args.append(("-p", str(self.extra.priority)))
-            if self.extra.array_range is not None:
-                args.append(("-J", self.extra.array_range))
-
-        # extra - email notification
-        if self.extra.notify_on is not None:
-            events = ""
-            if self.extra.notify_on.to is not None:
-                args.append(("-M", ", ".join(self.extra.notify_on.to)))
-            if self.extra.notify_on.on_started:
-                events += "b"
-            if self.extra.notify_on.on_finished:
-                events += "e"
-            if self.extra.notify_on.on_aborted:
-                events += "a"
-            if events:
-                args.append(("-m", events))
-
-        # extra - env
-        if self.extra.env is not None:
-            values = (f"{k}={v}" for k, v in self.extra.env.items())
-            args.append(("-v", ", ".join(values)))
-
-        # extra - extra attrs
-        extras = sorted(("=".join((k, str(v))) for k, v in vars(self.extra).items() if
-                         k not in self.extra.__fields__))
-        if extras:
-            args.append(("-W", ", ".join(extras)))
+            args += self.extra.parse_args()
+            # make flags come first
+            if self.extra.flags is not None:
+                args = self.extra.flags.parse_args() + args
 
         # TODO submit args
 
-        return " ".join((" " if arg[1] else "").join(arg) for arg in args)
+        return args
+
+    def to_qsub(self):
+        args = self.parse_args()
+        return " ".join((" " if len(arg) > 1 else "").join(arg) for arg in args)

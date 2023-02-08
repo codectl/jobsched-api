@@ -14,11 +14,12 @@ def test_qsub_deserializer(qsub_job):
     assert job.resources.node_count == 2
     assert job.resources.place == "pack"
     assert job.resources.walltime == "02:00:00"
-    assert job.paths.stdout == "/tmp/STDIN.o1"
-    assert job.paths.stderr == "/tmp/STDIN.e1"
-    assert job.paths.join_mode == "oe"
+    assert job.extra.priority == 0
     assert job.extra.account == "pbs_account"
     assert job.extra.project == "_pbs_project_default"
+    assert job.extra.paths.stdout == "/tmp/STDIN.o1"
+    assert job.extra.paths.stderr == "/tmp/STDIN.e1"
+    assert job.extra.paths.join_mode == "oe"
     assert job.extra.flags.interactive is True
     assert job.extra.flags.rerunable is True
     assert job.extra.flags.forward_X11 is True
@@ -66,11 +67,11 @@ def test_qstat_deserializer(qstat_job):
 
 
 def test_job_qsub_clause(qsub_job):
-    qsub = "-I -r y -X -N STDIN -q testq " \
+    qsub = "-I -r y -V -X -N STDIN -q testq " \
            "-l nodect=2 -l ncpus=5 -l ngpus=2 -l mem=10gb " \
            "-l place=pack -l walltime=02:00:00 " \
+           "-p 0 -A pbs_account -P _pbs_project_default " \
            "-o /tmp/STDIN.o1 -e /tmp/STDIN.e1 -j oe " \
-           "-A pbs_account -P _pbs_project_default -p 0 " \
            "-M testu@email.com -m be " \
            "-v HOME=/home/user, SHELL=/bin/bash " \
            "-W block=True, umask=33"
