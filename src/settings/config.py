@@ -2,7 +2,7 @@ import sys
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseSettings, Field, root_validator
+from pydantic import BaseSettings, Field, root_validator, validator
 
 
 class _SchedType(Enum):
@@ -12,19 +12,24 @@ class _SchedType(Enum):
 
 
 class _Sched(BaseSettings):
-    EXEC_PATH: Optional[str] = Field(None, env="EXEC")
-    HOME_PATH: Optional[str] = Field(None, env="HOME")
-    SERVER: Optional[str] = None
+    SCHED_TYPE: _SchedType
 
-    class Config(BaseSettings.Config):
-        @classmethod
-        def prepare_field(cls, field) -> None:
-            field_info_from_config = cls.get_field_info(field.name)
-            env = field_info_from_config.get('env') or field.field_info.extra.get('env')
-            env_names = {cls.env_prefix + (field.name if env is None else env)}
-            if not cls.case_sensitive:
-                env_names = env_names.__class__(n.lower() for n in env_names)
-            field.field_info.extra['env_names'] = env_names
+    class Config:
+        extra = "allow"
+
+    class _PBSSched(BaseSettings):
+        EXEC_PATH: Optional[str] = Field(..., env="PBS_EXEC")
+        HOME_PATH: Optional[str] = Field(..., env="PBS_HOME")
+        SERVER: Optional[str] = Field(..., env="PBS_SERVER")
+
+    def sched(self):
+        if self.SCHED_TYPE is _SchedType.PBS:
+            return self._PBSSched()
+        return None
+
+    @validator("SCHED_TYPE", pre=True)
+    def parse_sched(cls, value):
+        return _SchedType[value]
 
 
 class _Settings(BaseSettings):
@@ -40,7 +45,7 @@ class _Settings(BaseSettings):
     # OPENAPI supported version
     OPENAPI: str = "3.0.3"
 
-    SCHED_TYPE: _SchedType
+    # scheduler props
     SCHED: _Sched
 
     class Config:
@@ -50,13 +55,7 @@ class _Settings(BaseSettings):
 
     @root_validator(pre=True)
     def parse_sched(cls, values):
-        sched = _Sched
-        sched_type = _SchedType[values["SCHED_TYPE"]]
-        sched.Config.env_prefix = sched_type.name + "_"
-        for field in _Sched.__fields__.values():
-            sched.Config.prepare_field(field)
-        values["SCHED"] = sched()
-        values["SCHED_TYPE"] = sched_type
+        values["SCHED"] = _Sched().sched()
         return values
 
 
