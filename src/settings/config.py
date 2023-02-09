@@ -17,14 +17,14 @@ class _Sched(BaseSettings):
     class Config:
         extra = "allow"
 
-    class _PBSSched(BaseSettings):
+    class PBSSched(BaseSettings):
         EXEC_PATH: Optional[str] = Field(..., env="PBS_EXEC")
         HOME_PATH: Optional[str] = Field(..., env="PBS_HOME")
         SERVER: Optional[str] = Field(..., env="PBS_SERVER")
 
     def sched(self):
         if self.SCHED_TYPE is _SchedType.PBS:
-            return self._PBSSched()
+            return self.PBSSched()
         return None
 
     @validator("SCHED_TYPE", pre=True)
