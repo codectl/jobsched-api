@@ -40,6 +40,7 @@ class Qsub(Resource):
                             description: the job id
             400:
             401:
+            403:
         """
         props: JobSubmit = JobSubmit.parse_obj(request.json)
         try:
