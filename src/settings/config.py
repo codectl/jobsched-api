@@ -12,7 +12,7 @@ class _SchedType(Enum):
 
 
 class _Sched(BaseSettings):
-    SCHED_TYPE: _SchedType
+    SCHED_TYPE: Optional[_SchedType] = None
 
     class Config:
         extra = "allow"
@@ -25,11 +25,13 @@ class _Sched(BaseSettings):
     def sched(self):
         if self.SCHED_TYPE is _SchedType.PBS:
             return self.PBSSched()
-        return None
+        return self
 
     @validator("SCHED_TYPE", pre=True)
     def parse_sched(cls, value):
-        return _SchedType[value]
+        if value is not None:
+            return _SchedType[value]
+        return value
 
 
 class _Settings(BaseSettings):
