@@ -4,7 +4,7 @@ from werkzeug.local import LocalProxy
 
 from src.utils import abort_with
 from src.api.auth import requires_auth
-from src.models.job import Job
+from src.models.job import JobSubmit
 from src.services.pbs import PBS
 
 blueprint = Blueprint("pbs", __name__, url_prefix="/pbs")
@@ -12,10 +12,7 @@ api = Api(blueprint)
 
 # proxy to load PBS service
 _PBS = LocalProxy(
-    lambda: PBS(
-        exec_path=current_app.config["SCHED_EXEC_PATH"],
-        server=current_app.config["SCHED_SERVER"],
-    )
+    lambda: PBS()
 )
 
 
@@ -44,7 +41,7 @@ class Qsub(Resource):
             400:
             401:
         """
-        props: Job = Job.parse_obj(request.json)
+        props: JobSubmit = JobSubmit.parse_obj(request.json)
         try:
             return _PBS.qsub(props)
         except Exception as ex:
