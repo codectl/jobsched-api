@@ -1,5 +1,4 @@
 import abc
-from pathlib import Path
 from typing import Optional, Union
 
 from src.models.job import JobStat, JobSubmit, JobStatus
@@ -8,11 +7,11 @@ from src.models.job import JobStat, JobSubmit, JobStatus
 class Sched(abc.ABC):
     def __init__(
         self,
-        exec_path: Optional[Path] = None,
         server: Optional[str] = None,
+        env: Optional[dict] = None,
     ):
-        self.exec_path = exec_path
         self.server = server
+        self.env = env
 
     @abc.abstractmethod
     def qstat(
