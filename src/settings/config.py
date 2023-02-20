@@ -11,20 +11,20 @@ class _SchedType(Enum):
     TORQUE = "torque"
 
 
-class _Sched(BaseSettings):
+class _SchedEnv(BaseSettings):
     SCHED_TYPE: Optional[_SchedType] = None
 
     class Config:
         extra = "allow"
 
-    class PBSSched(BaseSettings):
+    class PBSSchedEnv(BaseSettings):
         EXEC_PATH: Optional[str] = Field(..., env="PBS_EXEC")
         HOME_PATH: Optional[str] = Field(..., env="PBS_HOME")
         SERVER: Optional[str] = Field(..., env="PBS_SERVER")
 
     def sched(self):
         if self.SCHED_TYPE is _SchedType.PBS:
-            return self.PBSSched()
+            return self.PBSSchedEnv()
         return self
 
     @validator("SCHED_TYPE", pre=True)
@@ -48,7 +48,7 @@ class _Settings(BaseSettings):
     OPENAPI: str = "3.0.3"
 
     # scheduler props
-    SCHED: _Sched
+    SCHED_ENV: _SchedEnv
 
     class Config:
         env_file = ".env"
@@ -57,7 +57,7 @@ class _Settings(BaseSettings):
 
     @root_validator(pre=True)
     def parse_sched(cls, values):
-        values["SCHED"] = _Sched().sched()
+        values["SCHED_ENV"] = _SchedEnv().sched()
         return values
 
 
