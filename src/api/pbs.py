@@ -11,9 +11,7 @@ blueprint = Blueprint("pbs", __name__, url_prefix="/pbs")
 api = Api(blueprint)
 
 # proxy to load PBS service
-_PBS = LocalProxy(
-    lambda: PBS()
-)
+_PBS = LocalProxy(lambda: PBS(env=current_app.config["SCHED_ENV"]))
 
 
 @api.resource("/qsub", endpoint="qsub")
