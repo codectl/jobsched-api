@@ -23,12 +23,6 @@ def job_submit(qsub_data):
     return JobSubmit(**qsub_data)
 
 
-@pytest.fixture(scope="class", autouse=True)
-def mock_shell(class_mocker):
-    mock = class_mocker.Mock()
-    return class_mocker.patch("src.services.pbs.shell", return_value=mock).return_value
-
-
 class TestPBSService:
 
     def test_qstat(self, pbs, qstat_data, mock_shell):
