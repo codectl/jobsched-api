@@ -1,5 +1,6 @@
 from flask import Blueprint, current_app, request
 from flask_restful import Api, Resource
+from pydantic import ValidationError
 from werkzeug.local import LocalProxy
 
 from src.utils import abort_with
@@ -32,16 +33,19 @@ class Qsub(Resource):
         responses:
             200:
                 content:
-                    text/plain; charset=utf-8:
+                    application/json:
                         schema:
-                            type: string
-                            description: the job id
+                            type: object
+                            properties:
+                                job_id:
+                                    type: string
+                                    description: the id of the submitted job
             400:
             401:
             403:
         """
-        props: JobSubmit = JobSubmit.parse_obj(request.json)
         try:
-            return _PBS.qsub(props)
-        except Exception as ex:
+            props: JobSubmit = JobSubmit.parse_obj(request.json)
+            return {"job_id": _PBS.qsub(props)}
+        except ValidationError as ex:
             abort_with(code=400, description=str(ex))

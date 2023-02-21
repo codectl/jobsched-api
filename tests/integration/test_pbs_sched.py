@@ -2,13 +2,6 @@ from base64 import b64encode
 
 import pytest
 
-from src.services.pbs import PBS
-
-
-@pytest.fixture(scope="class")
-def svc():
-    return PBS
-
 
 @pytest.fixture()
 def auth(app, mocker):
@@ -21,3 +14,10 @@ class TestPBSQsubPOST:
     def test_unauthorized_request_throws_401(self, client):
         response = client.post("/pbs/qsub", headers={})
         assert response.status_code == 401
+
+    def test_valid_job_returns_200(self, client, auth, qsub_job):
+        response = client.post("/pbs/qsub", headers=auth, json=qsub_job.dict())
+        print(response.json)
+        assert response.status_code == 200
+        assert response.text == ""
+        assert response.json == ["file.txt"]
