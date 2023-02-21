@@ -2,7 +2,7 @@ import sys
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseSettings, Field, root_validator, validator
+from pydantic import BaseSettings, Field, validator
 
 
 class _SchedType(Enum):
@@ -48,17 +48,12 @@ class _Settings(BaseSettings):
     OPENAPI: str = "3.0.3"
 
     # scheduler props
-    SCHED_ENV: _SchedEnv
+    SCHED_ENV: _SchedEnv = _SchedEnv().sched()
 
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
-
-    @root_validator(pre=True)
-    def parse_sched(cls, values):
-        values["SCHED_ENV"] = _SchedEnv().sched()
-        return values
 
 
 class ProductionSettings(_Settings):
