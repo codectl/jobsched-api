@@ -34,7 +34,15 @@ class TestPBSService:
     def test_qstat(self, pbs, qstat_data, mock_shell):
         mock_shell.configure_mock(**{"output.return_value": qstat_data})
         job = pbs.qstat(job_id="123")
-        assert False
+        submit_args = "-X -I -l select=1:ncpus=24:mem=32gb -l walltime=24:00:00"
+        assert job.name == "STDIN"
+        assert job.queue == "workq"
+        assert job.submit_args == submit_args
+        assert job.paths.stdout == "/home/testu/STDIN.o1"
+        assert job.paths.stderr == "/home/testu/STDIN.e1"
+        assert job.paths.join_mode == "n"
+        assert job.account == "pbs_account"
+        assert job.project == "_pbs_project_default"
 
     def test_qsub(self, pbs, job_submit):
-        job_submit.dict()
+        pbs.qsub(props=job_submit)
