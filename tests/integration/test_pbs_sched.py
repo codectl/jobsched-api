@@ -22,12 +22,17 @@ def auth(app, mocker):
 
 
 class TestPBSQsubPOST:
+    def test_valid_job_returns_200(self, client, auth, qsub_job, mock_shell):
+        job_id = "100.pbs00"
+        mock_shell.configure_mock(**{"output.return_value": job_id})
+        response = client.post("/pbs/qsub", headers=auth, json=qsub_job.dict())
+        assert response.status_code == 200
+        assert response.json == {"job_id": job_id}
+
     def test_unauthorized_request_throws_401(self, client):
         response = client.post("/pbs/qsub", headers={})
         assert response.status_code == 401
 
-    def test_valid_job_returns_200(self, client, auth, qsub_job, mock_shell):
-        mock_shell.configure_mock(**{"output.return_value": "100.pbs00"})
-        response = client.post("/pbs/qsub", headers=auth, json=qsub_job.dict())
-        assert response.status_code == 200
-        assert response.json == {"job_id": "100.pbs00"}
+    def test_unauthorized_request_throws_405(self, client):
+        response = client.get("/pbs/qsub")
+        assert response.status_code == 405
