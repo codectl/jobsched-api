@@ -33,6 +33,6 @@ class TestPBSQsubPOST:
         response = client.post("/pbs/qsub", headers={})
         assert response.status_code == 401
 
-    def test_unauthorized_request_throws_405(self, client):
+    def test_disallowed_method_throws_405(self, client):
         response = client.get("/pbs/qsub")
         assert response.status_code == 405
