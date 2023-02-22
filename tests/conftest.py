@@ -125,7 +125,7 @@ def qstat_job(qstat_data):
     return JobStat.parse_obj(qstat_data)
 
 
-@pytest.fixture(scope="class", autouse=True)
-def mock_shell(class_mocker):
-    mock = class_mocker.Mock()
-    return class_mocker.patch("src.services.pbs.shell", return_value=mock).return_value
+@pytest.fixture(autouse=True)
+def mock_shell(mocker):
+    mock = mocker.Mock()
+    return mocker.patch("src.services.pbs.shell", return_value=mock).return_value
