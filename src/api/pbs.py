@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 
 from flask import Blueprint, current_app, request
@@ -42,7 +44,7 @@ class Qstat(Resource):
             404:
             405:
         """
-        job: JobStat = _PBS.qstat(job_id)
+        job: None | JobStat = _PBS.qstat(job_id)
         if not job:
             abort_with(code=404, description="job not found")
         return json.loads(job.json())
