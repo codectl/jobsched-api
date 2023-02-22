@@ -5,7 +5,7 @@ from werkzeug.local import LocalProxy
 
 from src.utils import abort_with
 from src.api.auth import requires_auth
-from src.models.job import JobSubmit
+from src.models.job import JobStat, JobSubmit
 from src.services.pbs import PBS
 
 blueprint = Blueprint("pbs", __name__, url_prefix="/pbs")
@@ -15,12 +15,43 @@ api = Api(blueprint)
 _PBS = LocalProxy(lambda: PBS(env=current_app.config["SCHED_ENV"]))
 
 
+@api.resource("/qstat/<job_id>", endpoint="qstat")
+class Qstat(Resource):
+    @requires_auth(schemes=["basic"])
+    def post(self, job_id):
+        """
+        get job stats given a search criteria
+        ---
+        tags:
+            - PBS
+        parameters:
+            - in: path
+              name: job_id
+              schema:
+                type: string
+              required: True
+              description: the id of the job to query
+        responses:
+            200:
+                content:
+                    application/json:
+                        schema: JobStat
+            401:
+            404:
+            405:
+        """
+        job: JobStat = _PBS.qstat(job_id)
+        if not job:
+            abort_with(code=404, description="job not found")
+        return job
+
+
 @api.resource("/qsub", endpoint="qsub")
 class Qsub(Resource):
     @requires_auth(schemes=["basic"])
     def post(self):
         """
-        operation for job submission
+        submit a job given its properties
         ---
         tags:
             - PBS
@@ -29,7 +60,7 @@ class Qsub(Resource):
             required: true
             content:
                 application/json:
-                    schema: Job
+                    schema: JobSubmit
         responses:
             200:
                 content:
