@@ -1,3 +1,5 @@
+import json
+
 from flask import Blueprint, current_app, request
 from flask_restful import Api, Resource
 from pydantic import ValidationError
@@ -18,7 +20,7 @@ _PBS = LocalProxy(lambda: PBS(env=current_app.config["SCHED_ENV"]))
 @api.resource("/qstat/<job_id>", endpoint="qstat")
 class Qstat(Resource):
     @requires_auth(schemes=["basic"])
-    def post(self, job_id):
+    def get(self, job_id):
         """
         get job stats given a search criteria
         ---
@@ -43,7 +45,7 @@ class Qstat(Resource):
         job: JobStat = _PBS.qstat(job_id)
         if not job:
             abort_with(code=404, description="job not found")
-        return job
+        return json.loads(job.json())
 
 
 @api.resource("/qsub", endpoint="qsub")
