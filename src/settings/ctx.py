@@ -12,4 +12,5 @@ def ctx_settings(app):
 
     @app.errorhandler(HTTPException)
     def handle_http_errors(ex):
-        return http_response(code=ex.code), ex.code
+        description = "" if ex.code in (405,) else ex.description
+        return http_response(code=ex.code, description=description), ex.code

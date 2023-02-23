@@ -43,9 +43,10 @@ class TestPBSQstatGET:
 
     def test_not_found_job_throws_404(self, client, auth, mock_shell):
         mock_shell.configure_mock(**{"output.return_value": None})
-        response = client.get("/pbs/qstat/?.pbs00", headers=auth)
+        response = client.get("/pbs/qstat/00.pbs00", headers=auth)
         assert response.status_code == 404
-        assert response.json == {"code": 404, "description": "Not Found"}
+        assert response.json["code"] == 404
+        assert response.json["description"] == "Not Found: job '00.pbs00' not found"
 
     def test_disallowed_method_throws_405(self, client):
         response = client.post("/pbs/qstat/100.pbs00")
@@ -64,14 +65,15 @@ class TestPBSQsubPOST:
     def test__throws_400(self, client, auth, qsub_job, mock_shell):
         response = client.post("/pbs/qsub", headers=auth, json={"resources": "?"})
         assert response.status_code == 400
+        assert response.json["code"] == 400
         assert "Bad Request" in response.json["description"]
 
     def test_unauthorized_request_throws_401(self, client):
         response = client.post("/pbs/qsub", headers={})
         assert response.status_code == 401
-        assert "Unauthorized" in response.json["description"]
+        assert response.json == {"code": 401, "description": "Unauthorized"}
 
     def test_disallowed_method_throws_405(self, client):
         response = client.get("/pbs/qsub")
         assert response.status_code == 405
-        assert "Method Not Allowed" in response.json["description"]
+        assert response.json == {"code": 405, "description": "Method Not Allowed"}

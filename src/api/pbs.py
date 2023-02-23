@@ -43,7 +43,7 @@ class QstatAPI(MethodView):
         """
         job: None | JobStat = _PBS.qstat(job_id)
         if not job:
-            abort(code=404, description="job not found")
+            abort(code=404, description=f"job '{job_id}' not found")
         return json.loads(job.json())
 
 

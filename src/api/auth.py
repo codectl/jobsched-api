@@ -32,7 +32,7 @@ def requires_auth(schemes=("basic",)):
             elif "bearer" in schemes:
                 raise NotImplementedError
 
-            abort(401)
+            abort(401, description="")
 
         return decorated
 
