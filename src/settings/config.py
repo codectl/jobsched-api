@@ -45,7 +45,7 @@ class _Settings(BaseSettings):
     APPLICATION_ROOT: str = "/"
 
     # OPENAPI supported version
-    OPENAPI: str = "3.0.3"
+    OPENAPI: str = "3.1.0"
 
     # scheduler props
     SCHED_ENV: _SchedEnv = _SchedEnv().sched()
