@@ -13,7 +13,7 @@ from src.settings.config import settings_class, swagger_configs
 
 
 def create_app(environ="development", configs=None):
-    # define the WSGI application object
+    # the WSGI application
     app = Flask(__name__, static_folder=None)
 
     config = settings_class(environ)().dict()
@@ -31,7 +31,7 @@ def setup_app(app):
     url_prefix = app.config["APPLICATION_ROOT"]
     openapi_version = app.config["OPENAPI"]
 
-    # initial blueprint wiring
+    # route wiring
     index = Blueprint("index", __name__)
     _register_routes(parent=index)
     app.register_blueprint(index, url_prefix=url_prefix)
