@@ -2,7 +2,7 @@ from werkzeug.exceptions import HTTPException
 
 from flask import redirect, url_for
 
-from src import utils
+from src.utils import http_response
 
 
 def ctx_settings(app):
@@ -12,5 +12,4 @@ def ctx_settings(app):
 
     @app.errorhandler(HTTPException)
     def handle_http_errors(ex):
-        """Jsonify http errors."""
-        return utils.http_response(ex.code), ex.code
+        return http_response(code=ex.code), ex.code

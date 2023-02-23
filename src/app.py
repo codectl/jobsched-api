@@ -8,13 +8,11 @@ from flask import Blueprint, Flask
 from flask_cors import CORS
 
 from src import __description__, __title__, __version__
-from src.api.pbs import blueprint as pbs_blueprint
 from src.settings.ctx import ctx_settings
 from src.settings.config import settings_class, swagger_configs
 
 
 def create_app(environ="development", configs=None):
-
     # define the WSGI application object
     app = Flask(__name__, static_folder=None)
 
@@ -35,7 +33,7 @@ def setup_app(app):
 
     # initial blueprint wiring
     index = Blueprint("index", __name__)
-    index.register_blueprint(pbs_blueprint)
+    _register_routes(parent=index)
     app.register_blueprint(index, url_prefix=url_prefix)
 
     spec_template = base_template(
@@ -72,3 +70,13 @@ def setup_app(app):
 
     # settings within app ctx
     ctx_settings(app)
+
+
+def _register_routes(parent: Blueprint):
+    from src.api.pbs import QstatAPI, QsubAPI
+
+    pbs_api = Blueprint("pbs", __name__, url_prefix="/pbs")
+    pbs_api.add_url_rule("/qstat/<job_id>", view_func=QstatAPI.as_view("qstat"))
+    pbs_api.add_url_rule("/qsub", view_func=QsubAPI.as_view("qsub"))
+
+    parent.register_blueprint(pbs_api)

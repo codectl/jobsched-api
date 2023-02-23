@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import json
 
-from flask import Blueprint, current_app, request
-from flask_restful import Api, Resource
+from flask import current_app, request
+from flask.views import MethodView
 from pydantic import ValidationError
 from werkzeug.local import LocalProxy
 
@@ -12,15 +12,12 @@ from src.api.auth import requires_auth
 from src.models.job import JobStat, JobSubmit
 from src.services.pbs import PBS
 
-blueprint = Blueprint("pbs", __name__, url_prefix="/pbs")
-api = Api(blueprint)
-
 # proxy to load PBS service
 _PBS = LocalProxy(lambda: PBS(env=current_app.config["SCHED_ENV"]))
 
 
-@api.resource("/qstat/<job_id>", endpoint="qstat")
-class Qstat(Resource):
+class QstatAPI(MethodView):
+
     @requires_auth(schemes=["basic"])
     def get(self, job_id):
         """
@@ -50,8 +47,7 @@ class Qstat(Resource):
         return json.loads(job.json())
 
 
-@api.resource("/qsub", endpoint="qsub")
-class Qsub(Resource):
+class QsubAPI(MethodView):
     @requires_auth(schemes=["basic"])
     def post(self):
         """
@@ -83,4 +79,4 @@ class Qsub(Resource):
             props: JobSubmit = JobSubmit.parse_obj(request.json)
             return {"job_id": _PBS.qsub(props)}
         except ValidationError as ex:
-            abort_with(code=400, description=str(ex))
+            abort_with(code=400, description=ex.errors())
