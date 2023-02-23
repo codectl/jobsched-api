@@ -67,13 +67,15 @@ def test_qstat_deserializer(qstat_job):
 
 
 def test_job_qsub_clause(qsub_job):
-    qsub = "-I -r y -V -X -N STDIN -q testq " \
-           "-l nodect=2 -l ncpus=5 -l ngpus=2 -l mem=10gb " \
-           "-l place=pack -l walltime=02:00:00 " \
-           "-p 0 -A pbs_account -P _pbs_project_default " \
-           "-o /tmp/STDIN.o1 -e /tmp/STDIN.e1 -j oe " \
-           "-M testu@email.com -m be " \
-           "-v HOME=/home/user, SHELL=/bin/bash " \
-           "-W block=True, umask=33 " \
-            "-- /bin/sleep 1000"
+    qsub = (
+        "-I -r y -V -X -N STDIN -q testq "
+        "-l nodect=2 -l ncpus=5 -l ngpus=2 -l mem=10gb "
+        "-l place=pack -l walltime=02:00:00 "
+        "-p 0 -A pbs_account -P _pbs_project_default "
+        "-o /tmp/STDIN.o1 -e /tmp/STDIN.e1 -j oe "
+        "-M testu@email.com -m be "
+        "-v HOME=/home/user, SHELL=/bin/bash "
+        "-W block=True, umask=33 "
+        "-- /bin/sleep 1000"
+    )
     assert qsub_job.to_qsub() == qsub

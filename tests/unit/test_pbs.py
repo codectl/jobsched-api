@@ -6,11 +6,13 @@ from src.models.job import JobStat, JobSubmit
 
 @pytest.fixture(scope="class")
 def pbs():
-    return PBS(env={
-        "PBS_EXEC": "/opt/pbs/2022",
-        "PBS_HOME": "/opt/pbs/2022/var/spool",
-        "PBS_SERVER": "pbs00",
-    })
+    return PBS(
+        env={
+            "PBS_EXEC": "/opt/pbs/2022",
+            "PBS_HOME": "/opt/pbs/2022/var/spool",
+            "PBS_SERVER": "pbs00",
+        }
+    )
 
 
 @pytest.fixture(scope="class")
@@ -24,7 +26,6 @@ def job_submit(qsub_data):
 
 
 class TestPBSService:
-
     def test_qstat(self, pbs, qstat_data, mock_shell):
         mock_shell.configure_mock(**{"output.return_value": qstat_data})
         job = pbs.qstat(job_id="123")

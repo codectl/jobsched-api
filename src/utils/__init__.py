@@ -1,6 +1,5 @@
 from copy import deepcopy
 from dataclasses import asdict
-from typing import Dict, Type
 
 from apispec_plugins.types import HTTPResponse
 from flask_restful import abort
@@ -9,7 +8,7 @@ from pydantic.utils import lenient_issubclass
 from werkzeug.http import HTTP_STATUS_CODES
 
 
-def build_extra(model: Type[BaseModel], values: dict[str, Dict]):
+def build_extra(model: type[BaseModel], values: dict[str, dict]):
     for field in model.__fields__.values():
         if lenient_issubclass(field.type_, BaseModel):
             build_extra(field.type_, values)
@@ -20,7 +19,7 @@ def build_extra(model: Type[BaseModel], values: dict[str, Dict]):
     return values
 
 
-def unflatten(model: Type[BaseModel], values: dict[str, Dict]):
+def unflatten(model: type[BaseModel], values: dict[str, dict]):
     parsed, objs = deepcopy(values), []
 
     for field in model.__fields__.values():

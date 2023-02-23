@@ -8,11 +8,16 @@ from src.services.pbs import PBS
 
 @pytest.fixture(scope="class", autouse=True)
 def pbs(class_mocker):
-    class_mocker.patch("src.api.pbs.PBS", return_value=PBS(env={
-        "PBS_EXEC": "/opt/pbs/2022",
-        "PBS_HOME": "/opt/pbs/2022/var/spool",
-        "PBS_SERVER": "pbs00",
-    }))
+    class_mocker.patch(
+        "src.api.pbs.PBS",
+        return_value=PBS(
+            env={
+                "PBS_EXEC": "/opt/pbs/2022",
+                "PBS_HOME": "/opt/pbs/2022/var/spool",
+                "PBS_SERVER": "pbs00",
+            }
+        ),
+    )
 
 
 @pytest.fixture()
@@ -23,8 +28,9 @@ def auth(app, mocker):
 
 
 class TestPBSQstatGET:
-    def test_valid_job_id_returns_200(self, client, auth, qstat_data, qstat_job,
-                                      mock_shell):
+    def test_valid_job_id_returns_200(
+        self, client, auth, qstat_data, qstat_job, mock_shell
+    ):
         mock_shell.configure_mock(**{"output.return_value": qstat_data})
         response = client.get("/pbs/qstat/100.pbs00", headers=auth)
         assert response.status_code == 200

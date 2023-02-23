@@ -23,7 +23,6 @@ class JobStatus(Enum):
 
 
 class _JobModel(BaseModel, ABC, allow_population_by_field_name=True):
-
     @abstractmethod
     def parse_args(self) -> list[(str, Optional[str])]:
         raise NotImplementedError
@@ -199,6 +198,7 @@ class Job(_JobModel, ABC):
     The attributes of a job.
     For PBS job documentations, see at https://bit.ly/3WG0Mmg.
     """
+
     name: Optional[str] = Field(None, alias="Job_Name")
     queue: Optional[str] = None
     submit_args: Optional[str] = Field(None, alias="Submit_arguments")
@@ -228,7 +228,6 @@ class JobStat(Job, _JobExtra):
 
 
 class JobSubmit(Job):
-
     def parse_args(self):
         args = []
         if self.name is not None:

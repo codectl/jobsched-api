@@ -9,7 +9,6 @@ from src.services.sched import Sched
 
 
 class PBS(Sched):
-
     def qstat(self, job_id=None, status=None) -> None | JobStat:
         data = self._exec(action="qstat", args=job_id)
         if not data:

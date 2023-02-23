@@ -17,7 +17,6 @@ _PBS = LocalProxy(lambda: PBS(env=current_app.config["SCHED_ENV"]))
 
 
 class QstatAPI(MethodView):
-
     @requires_auth(schemes=["basic"])
     def get(self, job_id):
         """

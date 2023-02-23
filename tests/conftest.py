@@ -43,7 +43,7 @@ def qsub_data():
             },
             "block": True,
             "umask": 33,
-        }
+        },
     }
 
 
@@ -63,7 +63,7 @@ def qstat_data():
             "mem": "32gb",
             "ncpus": 24,
             "vmem": "187288kb",
-            "walltime": "00:02:00"
+            "walltime": "00:02:00",
         },
         "job_state": "R",
         "queue": "workq",
@@ -91,7 +91,7 @@ def qstat_data():
             "nodect": 1,
             "place": "free",
             "select": "1:ncpus=24:mem=32gb",
-            "walltime": "24:00:00"
+            "walltime": "24:00:00",
         },
         "stime": "Fri Feb 3 10:42:30 2023",
         "session_id": 16536,
@@ -107,7 +107,7 @@ def qstat_data():
             "PBS_O_WORKDIR": "/home/testu",
             "PBS_O_SYSTEM": "Linux",
             "PBS_O_QUEUE": "entry",
-            "PBS_O_HOST": "ln01.cluster"
+            "PBS_O_HOST": "ln01.cluster",
         },
         "comment": "Job run on Jan 01 at 00:00 on (cn01:ncpus=24:mem=33554432kb)",
         "etime": "Fri Feb 3 10:41:53 2023",
@@ -116,7 +116,7 @@ def qstat_data():
         "Submit_arguments": "-X -I -l select=1:ncpus=24:mem=32gb -l walltime=24:00:00",
         "project": "_pbs_project_default",
         "forward_x11_port": True,
-        "Submit_Host": "nn01.cluster"
+        "Submit_Host": "nn01.cluster",
     }
 
 
