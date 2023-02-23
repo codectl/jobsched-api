@@ -2,7 +2,7 @@ from copy import deepcopy
 from dataclasses import asdict
 
 from apispec_plugins.types import HTTPResponse
-from flask_restful import abort
+from flask import abort
 from pydantic import BaseModel
 from pydantic.utils import lenient_issubclass
 from werkzeug.http import HTTP_STATUS_CODES
@@ -44,6 +44,3 @@ def http_response(code: int, description=""):
     description = f"{reason}: {description}" if description else reason
     return asdict(HTTPResponse(code=code, description=description))
 
-
-def abort_with(code: int, description=""):
-    abort(code, **http_response(code, description=description))

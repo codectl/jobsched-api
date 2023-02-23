@@ -2,12 +2,11 @@ from __future__ import annotations
 
 import json
 
-from flask import current_app, request
+from flask import abort, current_app, request
 from flask.views import MethodView
 from pydantic import ValidationError
 from werkzeug.local import LocalProxy
 
-from src.utils import abort_with
 from src.api.auth import requires_auth
 from src.models.job import JobStat, JobSubmit
 from src.services.pbs import PBS
@@ -44,7 +43,7 @@ class QstatAPI(MethodView):
         """
         job: None | JobStat = _PBS.qstat(job_id)
         if not job:
-            abort_with(code=404, description="job not found")
+            abort(code=404, description="job not found")
         return json.loads(job.json())
 
 
@@ -82,4 +81,4 @@ class QsubAPI(MethodView):
             props: JobSubmit = JobSubmit.parse_obj(request.json)
             return {"job_id": _PBS.qsub(props)}
         except ValidationError as ex:
-            abort_with(code=400, description=ex.errors())
+            abort(code=400, description=ex.errors())

@@ -1,10 +1,9 @@
 from functools import wraps
 
-from flask import g, request
+from flask import abort, g, request
 from werkzeug.local import LocalProxy
 
 from src.services.auth import AuthSvc
-from src.utils import abort_with
 
 
 # proxy to load username
@@ -33,7 +32,7 @@ def requires_auth(schemes=("basic",)):
             elif "bearer" in schemes:
                 raise NotImplementedError
 
-            abort_with(401)
+            abort(401)
 
         return decorated
 
