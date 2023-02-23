@@ -24,6 +24,8 @@ class QstatAPI(MethodView):
         ---
         tags:
             - PBS
+        security:
+            - BasicAuth: []
         parameters:
             - in: path
               name: job_id
@@ -54,6 +56,8 @@ class QsubAPI(MethodView):
         ---
         tags:
             - PBS
+        security:
+            - BasicAuth: []
         requestBody:
             description: job properties
             required: true
