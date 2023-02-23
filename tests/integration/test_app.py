@@ -19,7 +19,6 @@ def local_app():
 
 class TestApp:
     def test_can_create_app(self, app):
-        """Ensure app is created."""
         assert app is not None
 
     def test_root_path_returns_200(self, client):
@@ -27,12 +26,10 @@ class TestApp:
         assert response.status_code == 200
 
     def test_swagger_apidocs_returns_200(self, client):
-        """Ensure app serves swagger specs."""
         response = client.get("/specs.json")
         assert response.status_code == 200
 
     def test_url_application_root_returns_200(self, local_app):
-        """Ensure root path is redirected to application root."""
         client = local_app.test_client()
 
         response = client.get("/")
@@ -45,3 +42,9 @@ class TestApp:
 
         response = client.get("/test/v1/specs.json")
         assert response.status_code == 200
+
+    def test_missing_path_throws_404(self, client):
+        response = client.get("/404")
+        assert response.status_code == 404
+        assert response.json["code"] == 404
+        assert "Not Found" in response.json["description"]
