@@ -22,13 +22,13 @@ class JobStatus(Enum):
     SUSPEND = "S"
 
 
-class _JobModel(BaseModel, ABC, allow_population_by_field_name=True):
+class JobBaseModel(BaseModel, ABC, allow_population_by_field_name=True):
     @abstractmethod
     def parse_args(self) -> list[(str, Optional[str])]:
         raise NotImplementedError
 
 
-class _JobResources(_JobModel):
+class JobResources(JobBaseModel):
     node_count: Optional[int] = Field(None, alias="nodect")
     mem: Optional[str] = None
     cpu: Optional[int] = Field(None, alias="ncpus")
@@ -56,12 +56,12 @@ class _JobResources(_JobModel):
         return args
 
 
-class _JobResourcesType(BaseModel):
-    request: Optional[_JobResources] = Field(None, alias="Resource_List")
-    used: Optional[_JobResources] = Field(None, alias="resources_used")
+class JobResourcesType(BaseModel):
+    request: Optional[JobResources] = Field(None, alias="Resource_List")
+    used: Optional[JobResources] = Field(None, alias="resources_used")
 
 
-class _JobTimeline(BaseModel):
+class JobTimeline(BaseModel):
     created_at: Optional[datetime] = Field(None, alias="ctime")
     updated_at: Optional[datetime] = Field(None, alias="mtime")
     queued_at: Optional[datetime] = Field(None, alias="qtime")
@@ -72,7 +72,7 @@ class _JobTimeline(BaseModel):
         return datetime.strptime(value, "%a %b %d %H:%M:%S %Y")
 
 
-class _JobPaths(_JobModel):
+class JobPaths(JobBaseModel):
     stdout: Optional[str] = Field(None, alias="Output_Path")
     stderr: Optional[str] = Field(None, alias="Error_Path")
     join_mode: Optional[str] = Field(None, alias="Join_Path")
@@ -94,7 +94,7 @@ class _JobPaths(_JobModel):
         return args
 
 
-class _JobFlags(_JobModel):
+class JobFlags(JobBaseModel):
     interactive: Optional[bool] = None
     rerunable: Optional[bool] = Field(None, alias="Rerunable")
     copy_env: Optional[bool] = None
@@ -117,7 +117,7 @@ class _JobFlags(_JobModel):
         return args
 
 
-class _JobNotification(_JobModel):
+class JobNotification(JobBaseModel):
     to: Optional[list[str]] = Field(None, alias="Mail_Users")
     on_started: Optional[bool] = None
     on_finished: Optional[bool] = None
@@ -155,16 +155,16 @@ class _JobNotification(_JobModel):
         return args
 
 
-class _JobExtra(_JobModel):
+class JobExtra(JobBaseModel):
     class Config:
         extra = Extra.allow
 
     priority: Optional[int] = Field(None, alias="Priority")
     account: Optional[str] = Field(None, alias="Account_Name")
     project: Optional[str] = None
-    paths: Optional[_JobPaths] = None
-    flags: Optional[_JobFlags] = None
-    notify_on: Optional[_JobNotification] = None
+    paths: Optional[JobPaths] = None
+    flags: Optional[JobFlags] = None
+    notify_on: Optional[JobNotification] = None
     array_range: Optional[str] = Field(None, alias="array_indices_submitted")
     env: Optional[dict] = Field(None, alias="Variable_List")
 
@@ -193,7 +193,7 @@ class _JobExtra(_JobModel):
         return args
 
 
-class Job(_JobModel, ABC):
+class Job(JobBaseModel, ABC):
     """
     The attributes of a job.
     For PBS job documentations, see at https://bit.ly/3WG0Mmg.
@@ -202,18 +202,18 @@ class Job(_JobModel, ABC):
     name: Optional[str] = Field(None, alias="Job_Name")
     queue: Optional[str] = None
     submit_args: Optional[str] = Field(None, alias="Submit_arguments")
-    resources: Optional[_JobResources] = None
-    extra: Optional[_JobExtra] = None
+    resources: Optional[JobResources] = None
+    extra: Optional[JobExtra] = None
 
 
-class JobStat(Job, _JobExtra):
+class JobStat(Job, JobExtra):
     job_id: Optional[str] = None
     owner: Optional[str] = Field(None, alias="Job_Owner")
     status: Optional[JobStatus] = Field(None, alias="job_state")
     server: Optional[str] = None
-    resources: Optional[_JobResourcesType] = None
+    resources: Optional[JobResourcesType] = None
     comment: Optional[str] = None
-    timeline: Optional[_JobTimeline] = None
+    timeline: Optional[JobTimeline] = None
     hold_type: Optional[str] = Field(None, alias="Hold_Types")
     extra: Optional[dict] = None
 
