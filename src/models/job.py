@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from datetime import datetime
@@ -31,13 +29,13 @@ class JobBaseModel(BaseModel, ABC, allow_population_by_field_name=True):
 
 
 class JobResources(JobBaseModel):
-    node_count: int | None = Field(None, alias="nodect")
-    mem: str | None = None
-    cpu: int | None = Field(None, alias="ncpus")
-    gpu: int | None = Field(None, alias="ngpus")
-    select: str | None = None
-    place: str | None = None
-    walltime: str | None = None
+    node_count: Optional[int] = Field(None, alias="nodect")
+    mem: Optional[str] = None
+    cpu: Optional[int] = Field(None, alias="ncpus")
+    gpu: Optional[int] = Field(None, alias="ngpus")
+    select: Optional[str] = None
+    place: Optional[str] = None
+    walltime: Optional[str] = None
 
     def parse_args(self):
         args = []
@@ -59,15 +57,15 @@ class JobResources(JobBaseModel):
 
 
 class JobResourcesType(BaseModel):
-    request: JobResources | None = Field(None, alias="Resource_List")
-    used: JobResources | None = Field(None, alias="resources_used")
+    request: Optional[JobResources] = Field(None, alias="Resource_List")
+    used: Optional[JobResources] = Field(None, alias="resources_used")
 
 
 class JobTimeline(BaseModel):
-    created_at: datetime | None = Field(None, alias="ctime")
-    updated_at: datetime | None = Field(None, alias="mtime")
-    queued_at: datetime | None = Field(None, alias="qtime")
-    ready_at: datetime | None = Field(None, alias="etime")
+    created_at: Optional[datetime] = Field(None, alias="ctime")
+    updated_at: Optional[datetime] = Field(None, alias="mtime")
+    queued_at: Optional[datetime] = Field(None, alias="qtime")
+    ready_at: Optional[datetime] = Field(None, alias="etime")
 
     @validator("*", pre=True)
     def parse_date(cls, value):
@@ -75,10 +73,10 @@ class JobTimeline(BaseModel):
 
 
 class JobPaths(JobBaseModel):
-    stdout: str | None = Field(None, alias="Output_Path")
-    stderr: str | None = Field(None, alias="Error_Path")
-    join_mode: str | None = Field(None, alias="Join_Path")
-    shell: str | None = Field(None, alias="Shell_Path_List")
+    stdout: Optional[str] = Field(None, alias="Output_Path")
+    stderr: Optional[str] = Field(None, alias="Error_Path")
+    join_mode: Optional[str] = Field(None, alias="Join_Path")
+    shell: Optional[str] = Field(None, alias="Shell_Path_List")
 
     def parse_args(self):
         args = []
@@ -97,12 +95,12 @@ class JobPaths(JobBaseModel):
 
 
 class JobFlags(JobBaseModel):
-    interactive: bool | None = None
-    rerunable: bool | None = Field(None, alias="Rerunable")
-    copy_env: bool | None = None
-    forward_X11: bool | None = Field(None, alias="forward_x11_port")
-    hold: bool | None = None
-    array: bool | None = None
+    interactive: Optional[bool] = None
+    rerunable: Optional[bool] = Field(None, alias="Rerunable")
+    copy_env: Optional[bool] = None
+    forward_X11: Optional[bool] = Field(None, alias="forward_x11_port")
+    hold: Optional[bool] = None
+    array: Optional[bool] = None
 
     def parse_args(self):
         args = []
@@ -120,11 +118,11 @@ class JobFlags(JobBaseModel):
 
 
 class JobNotification(JobBaseModel):
-    to: list[str] | None = Field(None, alias="Mail_Users")
-    on_started: bool | None = None
-    on_finished: bool | None = None
-    on_aborted: bool | None = None
-    events: str | None = Field(None, alias="Mail_Points")
+    to: Optional[list[str]] = Field(None, alias="Mail_Users")
+    on_started: Optional[bool] = None
+    on_finished: Optional[bool] = None
+    on_aborted: Optional[bool] = None
+    events: Optional[str] = Field(None, alias="Mail_Points")
 
     @validator("to", pre=True)
     def parse_to(cls, value):
@@ -161,14 +159,14 @@ class JobExtra(JobBaseModel):
     class Config:
         extra = Extra.allow
 
-    priority: int | None = Field(None, alias="Priority")
-    account: str | None = Field(None, alias="Account_Name")
-    project: str | None = None
-    paths: JobPaths | None = None
-    flags: JobFlags | None = None
-    notify_on: JobNotification | None = None
-    array_range: str | None = Field(None, alias="array_indices_submitted")
-    env: dict | None = Field(None, alias="Variable_List")
+    priority: Optional[int] = Field(None, alias="Priority")
+    account: Optional[str] = Field(None, alias="Account_Name")
+    project: Optional[str] = None
+    paths: Optional[JobPaths] = None
+    flags: Optional[JobFlags] = None
+    notify_on: Optional[JobNotification] = None
+    array_range: Optional[str] = Field(None, alias="array_indices_submitted")
+    env: Optional[dict] = Field(None, alias="Variable_List")
 
     def parse_args(self):
         args = []
@@ -201,23 +199,23 @@ class Job(JobBaseModel, ABC):
     For PBS job documentations, see at https://bit.ly/3WG0Mmg.
     """
 
-    name: str | None = Field(None, alias="Job_Name")
-    queue: str | None = None
-    submit_args: str | None = Field(None, alias="Submit_arguments")
-    resources: JobResources | None = None
-    extra: JobExtra | None = None
+    name: Optional[str] = Field(None, alias="Job_Name")
+    queue: Optional[str] = None
+    submit_args: Optional[str] = Field(None, alias="Submit_arguments")
+    resources: Optional[JobResources] = None
+    extra: Optional[JobExtra] = None
 
 
 class JobStat(Job, JobExtra):
-    job_id: str | None = None
-    owner: str | None = Field(None, alias="Job_Owner")
-    status: JobStatus | None = Field(None, alias="job_state")
-    server: str | None = None
-    resources: JobResourcesType | None = None
-    comment: str | None = None
-    timeline: JobTimeline | None = None
-    hold_type: str | None = Field(None, alias="Hold_Types")
-    extra: dict | None = None
+    job_id: Optional[str] = None
+    owner: Optional[str] = Field(None, alias="Job_Owner")
+    status: Optional[JobStatus] = Field(None, alias="job_state")
+    server: Optional[str] = None
+    resources: Optional[JobResourcesType] = None
+    comment: Optional[str] = None
+    timeline: Optional[JobTimeline] = None
+    hold_type: Optional[str] = Field(None, alias="Hold_Types")
+    extra: Optional[dict] = None
 
     @root_validator(pre=True)
     def unflatten(cls, values: dict[str, Any]) -> dict[str, Any]:
