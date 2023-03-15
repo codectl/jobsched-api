@@ -42,7 +42,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 apispec = "^6.3.0"
-apispec-plugins = "^1.0.0"
+apispec-plugins = "^1.0.1"
 apispec-ui = "^1.0.0"
 flask = "^2.2.3"
 flask-cors = "^3.0.10"
