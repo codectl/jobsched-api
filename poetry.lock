@@ -21,7 +21,7 @@ yaml = ["PyYAML (>=3.10)"]
 
 [[package]]
 name = "apispec-plugins"
-version = "1.0.1"
+version = "1.0.2"
 description = "Plugins for apispec"
 category = "main"
 optional = false
@@ -497,7 +497,7 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "6e443f35dffaffc5e277ee5d1fb01c43bcefeb894fd724d0f571bf146875be35"
+content-hash = "5b5286b7c887d3caf9cff5755736ea7a4b4a6c743ccc390e4a7ea4e692223268"
 
 [metadata.files]
 apispec = [
@@ -505,8 +505,8 @@ apispec = [
     {file = "apispec-6.3.0.tar.gz", hash = "sha256:6cb08d92ce73ff0b3bf46cb2ea5c00d57289b0f279fb0256a3df468182ba5344"},
 ]
 apispec-plugins = [
-    {file = "apispec_plugins-1.0.1-py3-none-any.whl", hash = "sha256:f52c0089097e4948ceb08e3aa4418d68579c0f2996c54b3e1bf97abbe46446cc"},
-    {file = "apispec_plugins-1.0.1.tar.gz", hash = "sha256:9dd725e417dc393f107cdaf392b86cb026c63a0378f02677023bf8618e7ce38a"},
+    {file = "apispec_plugins-1.0.2-py3-none-any.whl", hash = "sha256:42c0e9401d500543005d1c5e271de8e357bfdd575d5e2fd01d621bc2d34419cd"},
+    {file = "apispec_plugins-1.0.2.tar.gz", hash = "sha256:79f510c16ac5bccb0f604075ddca9e96ae53476e89b598396a74c81bbc0ea082"},
 ]
 apispec-ui = [
     {file = "apispec_ui-1.0.0-py3-none-any.whl", hash = "sha256:6759e4cf7c8e91e0f6279a666a48995a943f5c914f7624332710370549b8b595"},
