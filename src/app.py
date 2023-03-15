@@ -43,7 +43,7 @@ def setup_app(app):
             "version": __version__,
             "description": __description__,
         },
-        servers=[Server(url=url_prefix, description=app.config["ENV"])],
+        servers=[Server(url=url_prefix)],
         auths=[AuthSchemes.BasicAuth()],
         tags=[
             Tag(
