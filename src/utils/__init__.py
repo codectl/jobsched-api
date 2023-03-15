@@ -1,8 +1,7 @@
 from copy import deepcopy
 from dataclasses import asdict
 
-from apispec_plugins.types import HTTPResponse
-from flask import abort
+from apispec_plugins.base.types import HTTPResponse
 from pydantic import BaseModel
 from pydantic.utils import lenient_issubclass
 from werkzeug.http import HTTP_STATUS_CODES

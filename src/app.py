@@ -1,6 +1,6 @@
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
-from apispec_plugins.types import AuthSchemes, Server, Tag
+from apispec_plugins.base.types import AuthSchemes, Server, Tag
 from apispec_plugins.utils import base_template
 from apispec_plugins.webframeworks.flask import FlaskPlugin
 from apispec_ui.flask import Swagger
