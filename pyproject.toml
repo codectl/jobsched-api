@@ -28,7 +28,7 @@ keywords = [
     "web",
     "flask",
     "python",
-    "python3"
+    "python3",
 ]
 classifiers = [
     "Intended Audience :: Developers",
@@ -36,7 +36,8 @@ classifiers = [
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10"
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
 
 [tool.poetry.dependencies]
