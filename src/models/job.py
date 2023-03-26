@@ -4,7 +4,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import BaseModel, Extra, Field, root_validator, validator
+from apispec_plugins import BaseModel
+from pydantic import Extra, Field, root_validator, validator
 
 from src.utils import build_extra, unflatten
 
