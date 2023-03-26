@@ -1,6 +1,6 @@
 from apispec import APISpec
-from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_plugins.base.types import AuthSchemes, Server, Tag
+from apispec_plugins.ext.pydantic import PydanticPlugin
 from apispec_plugins.utils import base_template
 from apispec_plugins.webframeworks.flask import FlaskPlugin
 from apispec_ui.flask import Swagger
@@ -57,7 +57,7 @@ def setup_app(app):
         title=__title__,
         version=__version__,
         openapi_version=openapi_version,
-        plugins=(FlaskPlugin(), MarshmallowPlugin()),
+        plugins=(FlaskPlugin(), PydanticPlugin()),
         **spec_template
     )
 
