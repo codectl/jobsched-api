@@ -8,9 +8,9 @@ from src.models.job import JobStat, JobSubmit
 def pbs():
     return PBS(
         env={
-            "PBS_EXEC": "/opt/pbs/2022",
-            "PBS_HOME": "/opt/pbs/2022/var/spool",
-            "PBS_SERVER": "pbs00",
+            "EXEC_PATH": "/opt/pbs/2022",
+            "HOME_PATH": "/opt/pbs/2022/var/spool",
+            "SERVER": "pbs00",
         }
     )
 
