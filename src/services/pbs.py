@@ -10,8 +10,9 @@ from src.services.sched import Sched
 
 class PBS(Sched):
     def qstat(self, job_id=None, status=None) -> None | JobStat:
-        args = " ".join(("-F json", job_id))
+        args = " ".join(("-xf", "-F json", job_id))
         data = self._exec(action="qstat", args=args)
+        print(data)
         if not data:
             return None
         return JobStat(**data)
