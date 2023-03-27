@@ -42,4 +42,3 @@ def http_response(code: int, description=""):
     reason = HTTP_STATUS_CODES[code]
     description = f"{reason}: {description}" if description else reason
     return asdict(HTTPResponse(code=code, description=description))
-
