@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 
 from shell import shell
@@ -14,7 +15,7 @@ class PBS(Sched):
         data = self._exec(action="qstat", args=args)
         if not data:
             return None
-        job_data = next(data["Jobs"].values())
+        job_data = next(json.loads(data)["Jobs"].values())
         return JobStat(**job_data)
 
     def qsub(self, props: JobSubmit) -> str:
