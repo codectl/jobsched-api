@@ -10,10 +10,9 @@ password = os.environ["PASSWORD"]
 
 # POST request to create job
 r = requests.post(
-    url=f"{base_url}/pbs",
-    headers={"accept": "application/json"},
+    url=f"{base_url}/pbs/qsub",
     auth=(username, password),
-    data={
+    json={
         "name": "STDIN",
         "queue": "testq",
         "submit_args": "-- /bin/sleep 10",
