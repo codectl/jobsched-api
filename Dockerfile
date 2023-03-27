@@ -36,8 +36,10 @@ RUN apt update \
     && apt-get install -y munge libmunge-dev
 
 # system configurations
+COPY etc/sudoers.d/ /etc/sudoers.d/
 COPY etc/nslcd.conf /etc/
 COPY etc/nsswitch.conf /etc/
+RUN chmod 0700 /etc/sudoers.d/
 RUN chmod 0700 /etc/nslcd.conf
 RUN chmod 0755 /etc/nsswitch.conf
 
