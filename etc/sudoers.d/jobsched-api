@@ -1,0 +1,2 @@
+Cmnd_Alias SUDO_COMMANDS = /usr/sbin/nslcd, /usr/sbin/munged
+jobsched-api ALL=(ALL) NOPASSWD: SUDO_COMMANDS
