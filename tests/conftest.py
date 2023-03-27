@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from src.models.job import JobStat, JobSubmit
@@ -54,7 +56,7 @@ def qsub_job(qsub_data):
 
 @pytest.fixture(scope="class")
 def qstat_data():
-    return {
+    job_data = {
         "Job_Name": "STDIN",
         "Job_Owner": "testu",
         "resources_used": {
@@ -118,6 +120,7 @@ def qstat_data():
         "forward_x11_port": True,
         "Submit_Host": "nn01.cluster",
     }
+    return json.dumps({"Jobs": {"1000.pbs00": job_data}})
 
 
 @pytest.fixture(scope="class")
