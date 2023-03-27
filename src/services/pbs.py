@@ -19,6 +19,6 @@ class PBS(Sched):
         return self._exec(action="qsub", args=props.to_qsub())
 
     def _exec(self, action, args):
-        exe = os.path.join(self.env["PBS_EXEC"], "bin", action)
+        exe = os.path.join(self.env["EXEC_PATH"], "bin", action)
         cmd = " ".join((exe, args))
         return shell(command=cmd).output(raw=True)
