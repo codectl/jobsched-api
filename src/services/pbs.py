@@ -15,7 +15,7 @@ class PBS(Sched):
         data = self._exec(action="qstat", args=args)
         if not data:
             return None
-        job_data = next(json.loads(data)["Jobs"].values())
+        job_data = next(iter(json.loads(data)["Jobs"].values()))
         return JobStat(**job_data)
 
     def qsub(self, props: JobSubmit) -> str:
