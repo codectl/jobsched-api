@@ -10,3 +10,9 @@ data:
 
   # OPENAPI supported version
   OPENAPI: 3.0.3
+
+  # sched properties (PBS example)
+  SCHED_TYPE: PBS
+  PBS_EXEC: /opt/pbs/2022
+  PBS_HOME: /opt/pbs/2022/var/spool
+  PBS_SERVER: pbs00
