@@ -5,6 +5,7 @@ import json
 from flask import abort, current_app, request
 from flask.views import MethodView
 from pydantic import ValidationError
+from shell import CommandError
 from werkzeug.local import LocalProxy
 
 from src.api.auth import requires_auth
@@ -82,3 +83,5 @@ class QsubAPI(MethodView):
             return {"job_id": _PBS.qsub(props)}
         except ValidationError as ex:
             abort(code=400, description=ex.errors())
+        except CommandError as ex:
+            abort(code=400, description=str(ex))
