@@ -125,7 +125,7 @@ def qstat_data():
 
 @pytest.fixture(scope="class")
 def qstat_job(qstat_data):
-    return JobStat.parse_obj(qstat_data)
+    return JobStat.parse_obj(json.loads(qstat_data)["Jobs"]["1000.pbs00"])
 
 
 @pytest.fixture(autouse=True)
