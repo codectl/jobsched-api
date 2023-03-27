@@ -4,3 +4,4 @@ set -e
 
 # authentication service
 sudo nslcd
+sudo munged --force
