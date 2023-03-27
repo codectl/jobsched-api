@@ -1,8 +1,7 @@
 from apispec import APISpec
+from apispec_plugins import FlaskPlugin, PydanticPlugin
 from apispec_plugins.base.types import AuthSchemes, Server, Tag
-from apispec_plugins.ext.pydantic import PydanticPlugin
 from apispec_plugins.utils import base_template
-from apispec_plugins.webframeworks.flask import FlaskPlugin
 from apispec_ui.flask import Swagger
 from flask import Blueprint, Flask
 from flask_cors import CORS
