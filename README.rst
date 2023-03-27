@@ -14,6 +14,9 @@ jobsched-api
 .. image:: https://img.shields.io/badge/OAS-2_|_3-14ACBB.svg
     :target: https://github.com/OAI/OpenAPI-Specification
     :alt: OpenAPI Specification 2/3 compatible
+.. image:: https://img.shields.io/github/pipenv/locked/python-version/codectl/jobsched-api
+    :target: https://github.com/codectl/jobsched-api
+    :alt: Python compatibility
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
     :alt: code style: black
