@@ -24,7 +24,7 @@ class PBS(Sched):
     def _exec(self, action, args):
         exe = os.path.join(self.env["EXEC_PATH"], "bin", action)
         cmd = " ".join((exe, args))
-        sh = shell(command=cmd).run()
+        sh = shell(command=cmd)
         if sh.code > 0:
             raise CommandError(sh.errors(raw=True))
         return sh.output(raw=True)
