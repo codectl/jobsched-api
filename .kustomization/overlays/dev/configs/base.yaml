@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jobsched-api
+data:
+
+  # application root context
+  APPLICATION_ROOT: /api/jobsched/v1
+
+  # OPENAPI supported version
+  OPENAPI: 3.0.3

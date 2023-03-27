@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobsched-api
+  labels:
+    app: jobsched-api
+    framework: flask
+  annotations:
+    a8r.io/description: job scheduler API
+    a8r.io/owner: renatodamas
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: jobsched-api
+
+  strategy:
+    # Update each pod at a time and prevent
+    # additional pods from created
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 0
+
+  template:
+    metadata:
+      labels:
+        app: jobsched-api
+    spec:
+      containers:
+        - name: jobsched-api
+          image: jobsched-api:latest
+          imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: proxy
+            - configMapRef:
+                name: jobsched-api
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              add: [ ]
+      serviceAccountName: jobsched-api
+      restartPolicy: Always

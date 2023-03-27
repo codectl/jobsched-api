@@ -1,0 +1,14 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: jobsched-api
+spec:
+  rules:
+    - host: services.com
+      http:
+        paths:
+          - path: /api/jobsched/v1
+            backend:
+              serviceName: jobsched-api
+              servicePort: 80
