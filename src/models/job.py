@@ -218,6 +218,9 @@ class JobStat(Job, JobExtra):
     hold_type: Optional[str] = Field(None, alias="Hold_Types")
     extra: Optional[dict] = None
 
+    class Config:
+        extra = Extra.ignore
+
     @root_validator(pre=True)
     def unflatten(cls, values: dict[str, Any]) -> dict[str, Any]:
         return unflatten(model=cls, values=values)
