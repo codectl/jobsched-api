@@ -31,7 +31,9 @@ FROM base
 RUN apt update \
     # identity discovery modules
     && apt install -y libsasl2-dev libldap2-dev libssl-dev \
-    && apt install -y libnss-ldapd libpam-ldapd ldap-utils
+    && apt install -y libnss-ldapd libpam-ldapd ldap-utils \
+    # additional required libs
+    && apt-get install -y munge libmunge-dev
 
 # system configurations
 COPY etc/nslcd.conf /etc/
