@@ -28,4 +28,4 @@ class PBS(Sched):
         sh = shell(command=cmd)
         if sh.code > 0:
             raise CommandError(sh.errors(raw=True))
-        return sh.output(raw=True)
+        return sh.output(raw=True).strip()
