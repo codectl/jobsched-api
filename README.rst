@@ -11,6 +11,9 @@ jobsched-api
 .. image:: https://codecov.io/gh/codectl/jobsched-api/branch/master/graph/badge.svg
     :target: https://app.codecov.io/gh/codectl/jobsched-api/branch/master
     :alt: codecov
+.. image:: https://img.shields.io/badge/OAS-2_|_3-14ACBB.svg
+    :target: https://github.com/OAI/OpenAPI-Specification
+    :alt: OpenAPI Specification 2/3 compatible
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
     :target: https://github.com/psf/black
     :alt: code style: black
