@@ -39,6 +39,13 @@ spec:
                 name: proxy
             - configMapRef:
                 name: jobsched-api
+          volumeMounts:
+            - name: pbs
+              mountPath: /opt/pbs
+            - name: munge-key
+              mountPath: /etc/munge/munge.key
+            - name: munge-run
+              mountPath: /run/munge
           resources:
             requests:
               cpu: 500m
@@ -53,3 +60,18 @@ spec:
               add: [ ]
       serviceAccountName: jobsched-api
       restartPolicy: Always
+      volumes:
+        - name: pbs
+          hostPath:
+            path: /opt/pbs
+            type: Directory
+        - name: pbs-config
+          hostPath:
+            path: /etc/pbs.conf
+            type: File
+        - name: munge-run
+          emptyDir: {}
+        - name: munge-key
+          secret:
+            secretName: munge-key
+            defaultMode: 0400
