@@ -44,6 +44,8 @@ spec:
               mountPath: /opt/pbs
             - name: munge-key
               mountPath: /etc/munge/munge.key
+              subPath: munge.key
+              readOnly: true
             - name: munge-run
               mountPath: /run/munge
           resources:
