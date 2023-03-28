@@ -13,6 +13,6 @@ data:
 
   # sched properties (PBS example)
   SCHED_TYPE: PBS
-  PBS_EXEC: /opt/pbs/2022
-  PBS_HOME: /opt/pbs/2022/var/spool
+  PBS_EXEC: /opt/pbs
+  PBS_HOME: /var/spool/pbs
   PBS_SERVER: pbs00
