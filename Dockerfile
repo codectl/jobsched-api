@@ -29,12 +29,12 @@ FROM base
 
 # install system dependencies
 RUN apt update \
-    && apt-get install -y sudo \
+    && apt install -y sudo \
     # identity discovery modules
     && apt install -y libsasl2-dev libldap2-dev libssl-dev \
     && apt install -y libnss-ldapd libpam-ldapd ldap-utils \
     # additional required libs
-    && apt-get install -y munge libmunge-dev
+    && apt install -y munge libmunge-dev
 
 # system configurations
 COPY etc/sudoers.d/ /etc/sudoers.d/
