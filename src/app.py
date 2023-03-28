@@ -3,10 +3,11 @@ from apispec_plugins import FlaskPlugin, PydanticPlugin
 from apispec_plugins.base.types import AuthSchemes, Server, Tag
 from apispec_plugins.utils import base_template
 from apispec_ui.flask import Swagger
-from flask import Blueprint, Flask
+from flask import Flask
 from flask_cors import CORS
 
 from src import __description__, __title__, __version__
+from src.api.routes import register_routes
 from src.settings.ctx import ctx_settings
 from src.settings.config import settings_class, swagger_configs
 
@@ -31,9 +32,7 @@ def setup_app(app):
     openapi_version = app.config["OPENAPI"]
 
     # route wiring
-    index = Blueprint("index", __name__)
-    _register_routes(parent=index)
-    app.register_blueprint(index, url_prefix=url_prefix)
+    app.register_blueprint(register_routes(), url_prefix=url_prefix)
 
     spec_template = base_template(
         openapi_version=openapi_version,
@@ -69,13 +68,3 @@ def setup_app(app):
 
     # settings within app ctx
     ctx_settings(app)
-
-
-def _register_routes(parent: Blueprint):
-    from src.api.pbs import QstatAPI, QsubAPI
-
-    pbs_api = Blueprint("pbs", __name__, url_prefix="/pbs")
-    pbs_api.add_url_rule("/qstat/<job_id>", view_func=QstatAPI.as_view("qstat"))
-    pbs_api.add_url_rule("/qsub", view_func=QsubAPI.as_view("qsub"))
-
-    parent.register_blueprint(pbs_api)
