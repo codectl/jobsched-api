@@ -48,18 +48,20 @@ RUN chmod 0544 /etc/pbs.conf
 
 # create system user
 ENV USER jobsched-api
-RUN useradd --system -u 1000 $USER
+ENV UID 1000
+ENV GID 1000
+RUN useradd --system -u $UID $USER
 
 COPY src/ src/
 COPY bootstrap .
 COPY --from=builder /app/dist .
 RUN pip install *.whl
 
-RUN chown -R 1000:1000 .
+RUN chown -R $UID:$GID .
 RUN chmod -R 0500 .
 
 # run process as non root
-USER jobsched-api
+USER $USER
 
 # include bin in PATH
 ENV PATH $PATH:/opt/pbs/bin
