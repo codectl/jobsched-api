@@ -24,6 +24,6 @@ r = requests.post(
             "place": "pack",
             "walltime": "00:02:00",
         },
-    }
+    },
 )
 assert r.status_code == 200
