@@ -59,6 +59,9 @@ RUN chmod -R 0500 .
 # run process as non root
 USER jobsched-api
 
+# include bin in PATH
+ENV PATH $PATH:/opt/pbs/bin
+
 # command to run on container start
 ARG env="production"
 ENV ENV $env
