@@ -131,4 +131,5 @@ def qstat_job(qstat_data):
 @pytest.fixture(autouse=True)
 def mock_shell(mocker):
     mock = mocker.Mock()
+    mock.configure_mock(**{"code": 0, "output.return_value": ""})
     return mocker.patch("src.services.pbs.shell", return_value=mock).return_value
