@@ -12,8 +12,8 @@ def pbs(class_mocker):
         "src.api.pbs.PBS",
         return_value=PBS(
             env={
-                "EXEC_PATH": "/opt/pbs/2022",
-                "HOME_PATH": "/opt/pbs/2022/var/spool",
+                "EXEC_PATH": "/opt/pbs",
+                "HOME_PATH": "/var/spool/pbs",
                 "SERVER": "pbs00",
             }
         ),
