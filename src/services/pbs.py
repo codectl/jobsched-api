@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 
+from impersonation import impersonate
 from shell import CommandError, shell
 
 from src.models.job import JobStat, JobSubmit
@@ -22,10 +23,14 @@ class PBS(Sched):
     def qsub(self, props: JobSubmit) -> str:
         return self._exec(action="qsub", args=props.to_qsub())
 
-    def _exec(self, action, args):
-        exe = os.path.join(self.env["EXEC_PATH"], "bin", action)
-        cmd = " ".join((exe, args))
-        sh = shell(command=cmd)
-        if sh.code > 0:
-            raise CommandError(sh.errors(raw=True))
-        return sh.output(raw=True).strip()
+    def _exec(self, action, args, username=None):
+        @impersonate(username)
+        def exec_wrapper():
+            exe = os.path.join(self.env["EXEC_PATH"], "bin", action)
+            cmd = " ".join((exe, args))
+            sh = shell(command=cmd)
+            if sh.code > 0:
+                raise CommandError(sh.errors(raw=True))
+            return sh.output(raw=True).strip()
+
+        return exec_wrapper()
