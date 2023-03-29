@@ -210,6 +210,14 @@ python-versions = ">=3.7"
 license = ["ukkonen"]
 
 [[package]]
+name = "impersonation"
+version = "1.0.0"
+description = "Utility for user impersonation by running instructions under given user"
+category = "main"
+optional = false
+python-versions = ">=3.8,<4.0"
+
+[[package]]
 name = "importlib-metadata"
 version = "6.1.0"
 description = "Read metadata from Python packages"
@@ -497,7 +505,7 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "60510d33cb4bfbc842669826104d7369dc7782f4ec22b7820fafa1f3af3dde4c"
+content-hash = "2e13c2066e06c0bc178b0e2d97aaacbce78c2000a33483935230d3e4a9c701af"
 
 [metadata.files]
 apispec = [
@@ -612,6 +620,10 @@ gunicorn = [
 identify = [
     {file = "identify-2.5.22-py2.py3-none-any.whl", hash = "sha256:f0faad595a4687053669c112004178149f6c326db71ee999ae4636685753ad2f"},
     {file = "identify-2.5.22.tar.gz", hash = "sha256:f7a93d6cf98e29bd07663c60728e7a4057615068d7a639d132dc883b2d54d31e"},
+]
+impersonation = [
+    {file = "impersonation-1.0.0-py3-none-any.whl", hash = "sha256:4ed4e0539a9a61656858d75870993b275028d89c32223a442953078161fa0727"},
+    {file = "impersonation-1.0.0.tar.gz", hash = "sha256:2054dc4f261c2272ed98cdaa8ca8975bec0b3ea020046d413a58980cb822ea4e"},
 ]
 importlib-metadata = [
     {file = "importlib_metadata-6.1.0-py3-none-any.whl", hash = "sha256:ff80f3b5394912eb1b108fcfd444dc78b7f1f3e16b16188054bd01cb9cb86f09"},
