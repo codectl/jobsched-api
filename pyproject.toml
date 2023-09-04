@@ -53,7 +53,7 @@ shell = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
 coverage = "^7.3.0"
-pre-commit = "^3.3.3"
+pre-commit = "^3.4.0"
 pytest = "^7.4.0"
 pytest-mock = "^3.11.1"
 
